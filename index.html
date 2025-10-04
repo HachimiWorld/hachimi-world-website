@@ -1,456 +1,448 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>基米天堂（建设中） - 发现和分享基米艺术的开源社区</title>
-    <link rel="icon" href="/favicon.ico">
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#FF7022',
-                        secondary: '#1AA78D',
-                        accent: '#ec4899',
-                        dark: '#3b321e',
-                    },
-                    /*colors: {
-                        primary: '#6366f1',
-                        secondary: '#8b5cf6',
-                        accent: '#ec4899',
-                        dark: '#1e293b',
-                    },*/
-                    animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    }
-                }
-            }
-        }
-        window.onload = async () => {
-          await Promise.all([
-            fetchVersion('windows'),
-            fetchVersion('android'),
-            fetchVersion('macos'),
-            fetchVersion('linux')
-          ])
-        }
-        async function fetchVersion(platform) {
-          const variant = "release-" + platform
-          const resp = await fetch(new Request('https://api.hachimi.world/version/latest?variant=' + variant))
-          const data = await resp.json()
-          if (data.ok) {
-            const id = '#version-' + platform
-            const downloadId = '#download-' + platform
-            const timeId = '#release-time-' + platform
-            document.querySelector(id).textContent = data.data.version_name
-            document.querySelector(downloadId).href = data.data.url
-            document.querySelector(timeId).textContent = new Date(data.data.release_time).toLocaleString('zh-CN', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false
-            })
-          } else {
-            console.log(data.data.msg)
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基米天堂（建设中） - 发现和分享哈基米艺术的开源社区</title>
+  <link rel="icon" href="/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.4.5/mobile-detect.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF7022',
+            secondary: '#1AA78D',
+            accent: '#ec4899',
+            dark: '#3b321e',
+          },
+          /*colors: {
+              primary: '#6366f1',
+              secondary: '#8b5cf6',
+              accent: '#ec4899',
+              dark: '#1e293b',
+          },*/
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           }
         }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            scroll-behavior: smooth;
-            overflow-x: hidden;
-        }
-        /*.gradient-bg {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
-        }*/
-        .gradient-bg {
-            background: linear-gradient(135deg, #FF7022 0%, #1AA78D 50%, #ec4899 100%);
-        }
-        .hero-pattern {
-            background-color: #1e293b;
-            /*background-color: #1e293b;*/
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-    </style>
+      }
+    }
+    window.onload = async () => {
+      const md = new MobileDetect(window.navigator.userAgent);
+      if (!md.mobile() && !md.tablet()) {
+        // Show
+        document.getElementById('web-app').style.display = 'block'
+      }
+      await Promise.all([
+        fetchVersion('windows'),
+        fetchVersion('android'),
+        fetchVersion('macos'),
+        fetchVersion('linux')
+      ])
+    }
+
+    async function fetchVersion(platform) {
+      const variant = "release-" + platform
+      const resp = await fetch(new Request('https://api.hachimi.world/version/latest?variant=' + variant))
+      const data = await resp.json()
+      if (data.ok) {
+        const id = '#version-' + platform
+        const downloadId = '#download-' + platform
+        const timeId = '#release-time-' + platform
+        document.querySelector(id).textContent = data.data.version_name
+        document.querySelector(downloadId).href = data.data.url
+        document.querySelector(timeId).textContent = new Date(data.data.release_time).toLocaleString('zh-CN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        })
+      } else {
+        console.log(data.data.msg)
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+
+    /*.gradient-bg {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    }*/
+    .gradient-bg {
+      background: linear-gradient(135deg, #FF7022 0%, #1AA78D 50%, #ec4899 100%);
+    }
+
+    .hero-pattern {
+      background-color: #1e293b;
+      /*background-color: #1e293b;*/
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+  </style>
 </head>
 <body class="bg-slate-900 text-white">
 <!-- 导航栏 -->
 <nav class="fixed w-full bg-slate-900/90 backdrop-blur-sm z-50 py-4 px-6 border-b border-slate-800">
-    <div class="container mx-auto flex justify-between items-center">
-        <div class="flex items-center">
-            <!--<div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mr-3">
-                <i class="fas fa-music text-white"></i>
-            </div>
-            <span class="text-xl font-bold bg-clip-text text-transparent gradient-bg">基米天堂</span>-->
-            <img src="brand.svg"/>
-        </div>
-
-        <div class="hidden md:flex space-x-8">
-            <a href="#features" class="hover:text-primary transition-colors">特色</a>
-            <a href="#download" class="hover:text-primary transition-colors">下载</a>
-            <a href="#community" class="hover:text-primary transition-colors">社区</a>
-            <a href="#about" class="hover:text-primary transition-colors">关于</a>
-        </div>
-
-        <a href="https://github.com/HachimiWorld" target="_blank" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors flex items-center">
-            <i class="fab fa-github mr-2"></i> GitHub
-        </a>
+  <div class="container mx-auto flex justify-between items-center">
+    <div class="flex items-center">
+      <!--<div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mr-3">
+          <i class="fas fa-music text-white"></i>
+      </div>
+      <span class="text-xl font-bold bg-clip-text text-transparent gradient-bg">基米天堂</span>-->
+      <img src="static/logo-dark.svg"/>
     </div>
+
+    <div class="hidden md:flex space-x-8">
+      <a href="#features" class="hover:text-primary transition-colors">特色</a>
+      <a href="#download" class="hover:text-primary transition-colors">下载</a>
+      <a href="#community" class="hover:text-primary transition-colors">社区</a>
+      <a href="#about" class="hover:text-primary transition-colors">关于</a>
+    </div>
+
+    <a href="https://github.com/HachimiWorld" target="_blank"
+       class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors flex items-center">
+      <i class="fab fa-github mr-2"></i> GitHub
+    </a>
+  </div>
 </nav>
 
 <!-- 首屏区域 -->
 <section class="hero-pattern pt-32 pb-20 px-6">
-    <div class="container mx-auto max-w-6xl">
-        <div class="flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 mb-12 md:mb-0">
-                <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
-                    发现和分享你喜爱的
-                    <span class="bg-clip-text text-transparent gradient-bg">基米艺术</span>
-                </h1>
-                <p class="text-xl text-slate-300 mb-8">
-                    一个由社区为爱发电驱动的开源音乐平台<br>
-                </p>
-                <p class="text-l text-slate-300 mb-8">
-                  听音乐我只听哈基米音乐
-                </p>
-                <div class="flex flex-wrap gap-4"  style="z-index: 999">
-                    <a href="#download" class="bg-primary hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors flex items-center">
-                        <i class="fas fa-download mr-2"></i> 立即下载
-                    </a>
-                    <a href="#features" class="border border-slate-700 hover:border-primary px-6 py-3 rounded-lg font-medium transition-colors">
-                        了解更多
-                    </a>
-                </div>
-            </div>
-            <div class="md:w-1/2 flex justify-center">
-                <div class="relative w-full max-w-md">
-                    <div class="absolute -top-6 -left-6 w-64 h-64 bg-primary rounded-full mix-blend-screen opacity-20 animate-pulse-slow"></div>
-                    <div class="absolute -bottom-6 -right-6 w-64 h-64 bg-secondary rounded-full mix-blend-screen opacity-20 animate-pulse-slow animation-delay-1000"></div>
-                    <!--<div class="relative bg-slate-800/50 backdrop-blur-md rounded-2xl p-6 border border-slate-700 shadow-xl">
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="flex items-center">
-                                <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                            </div>
-                            <div class="text-sm text-slate-400">基米天堂 v1.0</div>
-                        </div>
-                        <div class="bg-slate-900 rounded-lg p-4 mb-4">
-                            <div class="flex items-center mb-4">
-                                <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center mr-3">
-                                    <i class="fas fa-user-alt text-white"></i>
-                                </div>
-                                <div>
-                                    <div class="font-medium">音乐创作者</div>
-                                    <div class="text-sm text-slate-400">发布新作品</div>
-                                </div>
-                            </div>
-                            <div class="text-slate-300 text-sm mb-2">《星空下的旋律》- 沉浸式环境音乐</div>
-                            <div class="flex justify-between items-center">
-                                <div class="text-xs text-slate-500">3小时前发布</div>
-                                <div class="flex">
-                                    <div class="mr-3 text-slate-400"><i class="fas fa-heart mr-1"></i> 128</div>
-                                    <div class="text-slate-400"><i class="fas fa-comment mr-1"></i> 24</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-slate-900 rounded-lg p-4">
-                            <div class="flex items-center mb-4">
-                                <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center mr-3">
-                                    <i class="fas fa-user-alt text-white"></i>
-                                </div>
-                                <div>
-                                    <div class="font-medium">节奏大师</div>
-                                    <div class="text-sm text-slate-400">分享了作品</div>
-                                </div>
-                            </div>
-                            <div class="text-slate-300 text-sm mb-2">《城市脉搏》- 电子混音版上线</div>
-                            <div class="flex justify-between items-center">
-                                <div class="text-xs text-slate-500">昨天发布</div>
-                                <div class="flex">
-                                    <div class="mr-3 text-slate-400"><i class="fas fa-heart mr-1"></i> 89</div>
-                                    <div class="text-slate-400"><i class="fas fa-comment mr-1"></i> 15</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>-->
-                </div>
-            </div>
+  <div class="container mx-auto max-w-6xl">
+    <div class="flex flex-col md:flex-row items-center">
+      <div class="md mb-12 md:mb-0">
+        <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
+          发现和分享你喜爱的
+          <span class="bg-clip-text text-transparent gradient-bg">哈基米艺术</span>
+        </h1>
+        <p class="text-xl text-slate-300 mb-8">
+          一个由社区为爱发电驱动的开源音乐平台<br>
+        </p>
+        <p class="text-l text-slate-300 mb-8">
+          听音乐我只听哈基米音乐
+        </p>
+        <div class="flex flex-wrap gap-4" style="z-index: 999">
+          <a href="#download"
+             class="bg-primary hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors flex items-center">
+            <i class="fas fa-download mr-2"></i> 立即下载
+          </a>
+          <a href="#features"
+             class="border border-slate-700 hover:border-primary px-6 py-3 rounded-lg font-medium transition-colors">
+            了解更多
+          </a>
+          <a href="/app/"
+             class="bg-secondary hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors flex items-center"
+             id="web-app"
+          >
+            进入 Web 端（实验性）
+          </a>
         </div>
+      </div>
     </div>
+    <img class="mt-8 shadow-xl" src="static/screenshot-light.webp" alt="screenshot"/>
+  </div>
 </section>
 
 <!-- 价值主张 -->
 <section id="features" class="py-20 px-6 bg-slate-800">
-    <div class="container mx-auto max-w-6xl">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4">为什么选择基米天堂</h2>
-            <p class="text-xl text-slate-300 max-w-2xl mx-auto">我们为哈基米音乐创作者和爱好者打造了一个独特的开源音乐平台</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
-                <div class="w-14 h-14 rounded-full gradient-bg flex items-center justify-center mb-6">
-                    <i class="fas fa-compass text-2xl text-white"></i>
-                </div>
-                <h3 class="text-xl font-semibold mb-3">探索艺术</h3>
-                <p class="text-slate-300">在我们专为哈基米艺术定制的社区里探索你喜爱的作品。</p>
-            </div>
-
-            <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
-                <div class="w-14 h-14 rounded-full gradient-bg flex items-center justify-center mb-6">
-                    <i class="fas fa-microphone-alt text-2xl text-white"></i>
-                </div>
-                <h3 class="text-xl font-semibold mb-3">成为神人</h3>
-                <p class="text-slate-300">上传和分享你的哈基米作品，成为哈基米艺术的引导者，与志同道合的音乐人合作。</p>
-            </div>
-
-            <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
-                <div class="w-14 h-14 rounded-full gradient-bg flex items-center justify-center mb-6">
-                    <i class="fas fa-heart text-2xl text-white"></i>
-                </div>
-                <h3 class="text-xl font-semibold mb-3">社区驱动</h3>
-                <p class="text-slate-300">完全由爱好者开发和维护的开源平台，所有功能都围绕你的需求设计，不包含任何商业内容。</p>
-            </div>
-        </div>
+  <div class="container mx-auto max-w-6xl">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">为什么选择基米天堂</h2>
+      <p class="text-xl text-slate-300 max-w-2xl mx-auto">我们为哈基米音乐创作者和爱好者打造了一个独特的开源音乐平台</p>
     </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
+        <div class="w-14 h-14 rounded-full gradient-bg flex items-center justify-center mb-6">
+          <i class="fas fa-compass text-2xl text-white"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-3">探索艺术</h3>
+        <p class="text-slate-300">在我们专为哈基米艺术定制的社区里探索你喜爱的作品。</p>
+      </div>
+
+      <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
+        <div class="w-14 h-14 rounded-full gradient-bg flex items-center justify-center mb-6">
+          <i class="fas fa-microphone-alt text-2xl text-white"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-3">成为神人</h3>
+        <p class="text-slate-300">上传和分享你的哈基米作品，成为哈基米艺术的引导者，与志同道合的音乐人合作。</p>
+      </div>
+
+      <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
+        <div class="w-14 h-14 rounded-full gradient-bg flex items-center justify-center mb-6">
+          <i class="fas fa-heart text-2xl text-white"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-3">社区驱动</h3>
+        <p class="text-slate-300">完全由爱好者开发和维护的开源平台，所有功能都围绕你的需求设计，不包含任何商业内容。</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- 下载区域 -->
 <section id="download" class="py-20 px-6 hero-pattern">
-    <div class="container mx-auto max-w-6xl">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4">下载最新的基米天堂客户端</h2>
-            <p class="text-xl text-slate-300 max-w-2xl mx-auto">基米天堂客户端通过 GitHub Actions 进行全自动构建</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-                <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fab fa-windows text-3xl text-white"></i>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Windows</h3>
-                <p class="text-slate-300 text-sm mb-2">Windows 10 及以上版本</p>
-                <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-windows" class="text-xs">...</span></p>
-                <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-windows" class="text-xs">...</span></p>
-                <a id="download-windows" target="_blank">
-                    <button class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
-                        <i class="fas fa-download mr-2"></i> 下载
-                    </button>
-                </a>
-            </div>
-
-            <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-                <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fab fa-android text-3xl text-white"></i>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Android</h3>
-                <p class="text-slate-300 text-sm mb-2">Android 9.0 及以上版本</p>
-              <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-android" class="text-xs">...</span></p>
-              <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-android" class="text-xs">...</span></p>
-                <a id="download-android" target="_blank">
-                    <button class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
-                        <i class="fas fa-download mr-2"></i> 下载
-                    </button>
-                </a>
-            </div>
-
-            <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-                <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fab fa-apple text-3xl text-white"></i>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Mac OS</h3>
-                <p class="text-slate-300 text-sm mb-2">Apple & Intel 芯片</p>
-              <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-macos" class="text-xs">...</span></p>
-              <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-macos" class="text-xs">...</span></p>
-                <a id="download-macos" target="_blank">
-                    <button class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
-                        <i class="fas fa-download mr-2"></i> 下载
-                    </button>
-                </a>
-            </div>
-
-            <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-                <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fab fa-linux text-3xl text-white"></i>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Linux</h3>
-                <p class="text-slate-300 text-sm mb-2">DEB 包可用</p>
-              <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-linux" class="text-xs">...</span></p>
-              <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-linux" class="text-xs">...</span></p>
-                <a id="download-linux" target="_blank">
-                    <button class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
-                        <i class="fas fa-download mr-2"></i> 下载
-                    </button>
-                </a>
-            </div>
-
-        </div>
-
-        <!--<div class="text-center mt-12 text-slate-400">
-            <p>需要其他平台？查看我们的 <a href="#" class="text-primary hover:underline">其他下载选项</a></p>
-        </div>-->
+  <div class="container mx-auto max-w-6xl">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">下载最新的基米天堂客户端</h2>
+      <p class="text-xl text-slate-300 max-w-2xl mx-auto">基米天堂客户端通过 GitHub Actions 进行全自动构建</p>
     </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
+      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
+        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
+          <i class="fab fa-windows text-3xl text-white"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">Windows</h3>
+        <p class="text-slate-300 text-sm mb-2">Windows 10 及以上版本</p>
+        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-windows" class="text-xs">...</span>
+        </p>
+        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-windows" class="text-xs">...</span></p>
+        <a id="download-windows" target="_blank">
+          <button
+            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
+            <i class="fas fa-download mr-2"></i> 下载
+          </button>
+        </a>
+      </div>
+
+      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
+        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
+          <i class="fab fa-android text-3xl text-white"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">Android</h3>
+        <p class="text-slate-300 text-sm mb-2">Android 9.0 及以上版本</p>
+        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-android" class="text-xs">...</span>
+        </p>
+        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-android" class="text-xs">...</span></p>
+        <a id="download-android" target="_blank">
+          <button
+            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
+            <i class="fas fa-download mr-2"></i> 下载
+          </button>
+        </a>
+      </div>
+
+      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
+        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
+          <i class="fab fa-apple text-3xl text-white"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">Mac OS</h3>
+        <p class="text-slate-300 text-sm mb-2">Apple & Intel 芯片</p>
+        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-macos" class="text-xs">...</span></p>
+        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-macos" class="text-xs">...</span></p>
+        <a id="download-macos" target="_blank">
+          <button
+            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
+            <i class="fas fa-download mr-2"></i> 下载
+          </button>
+        </a>
+      </div>
+
+      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
+        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
+          <i class="fab fa-linux text-3xl text-white"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">Linux</h3>
+        <p class="text-slate-300 text-sm mb-2">DEB 包可用</p>
+        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-linux" class="text-xs">...</span></p>
+        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-linux" class="text-xs">...</span></p>
+        <a id="download-linux" target="_blank">
+          <button
+            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
+            <i class="fas fa-download mr-2"></i> 下载
+          </button>
+        </a>
+      </div>
+
+      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
+        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
+          <i class="fab fa-apple text-3xl text-white"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">iOS</h3>
+        <p class="text-slate-300 text-sm mb-2">敬请期待</p>
+      </div>
+
+    </div>
+
+    <!--<div class="text-center mt-12 text-slate-400">
+        <p>需要其他平台？查看我们的 <a href="#" class="text-primary hover:underline">其他下载选项</a></p>
+    </div>-->
+  </div>
 </section>
 
 <!-- 社区证明 -->
 <section id="community" class="py-20 px-6 bg-slate-800">
-    <div class="container mx-auto max-w-6xl">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4">社区的声音</h2>
-            <p class="text-xl text-slate-300 max-w-2xl mx-auto">看看我们的用户如何评价基米天堂</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-slate-700/30 rounded-2xl p-6">
-                <div class="flex mb-4">
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                </div>
-                <p class="text-slate-300 mb-6">"基米天堂彻底改变了我分享音乐的方式。开源模式让社区能够真正塑造平台的发展方向。"</p>
-                <div class="flex items-center">
-                    <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mr-3">
-                        <i class="fas fa-user text-white"></i>
-                    </div>
-                    <div>
-                        <div class="font-medium">随便编的</div>
-                        <div class="text-sm text-slate-400">电子音乐制作人</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-slate-700/30 rounded-2xl p-6">
-                <div class="flex mb-4">
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                </div>
-                <p class="text-slate-300 mb-6">"作为一名独立音乐人，基米天堂给了我展示作品的平台，并让我结识了许多有才华的合作者。"</p>
-                <div class="flex items-center">
-                    <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mr-3">
-                        <i class="fas fa-user text-white"></i>
-                    </div>
-                    <div>
-                        <div class="font-medium">随便编的</div>
-                        <div class="text-sm text-slate-400">独立歌手</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-slate-700/30 rounded-2xl p-6">
-                <div class="flex mb-4">
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                    <i class="fas fa-star text-yellow-400"></i>
-                </div>
-                <p class="text-slate-300 mb-6">"开源社区的力量真是太棒了！我可以直接参与开发，为平台添加我需要的功能。"</p>
-                <div class="flex items-center">
-                    <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mr-3">
-                        <i class="fas fa-user text-white"></i>
-                    </div>
-                    <div>
-                        <div class="font-medium">随便编的</div>
-                        <div class="text-sm text-slate-400">开发者和音乐爱好者</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="container mx-auto max-w-6xl">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">社区的声音</h2>
+      <p class="text-xl text-slate-300 max-w-2xl mx-auto">看看我们的用户如何评价基米天堂</p>
     </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="bg-slate-700/30 rounded-2xl p-6">
+        <div class="flex mb-4">
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+        </div>
+        <p class="text-slate-300 mb-6">
+          "基米天堂彻底改变了我分享音乐的方式。开源模式让社区能够真正塑造平台的发展方向。"</p>
+        <div class="flex items-center">
+          <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mr-3">
+            <i class="fas fa-user text-white"></i>
+          </div>
+          <div>
+            <div class="font-medium">随便编的</div>
+            <div class="text-sm text-slate-400">电子音乐制作人</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-700/30 rounded-2xl p-6">
+        <div class="flex mb-4">
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+        </div>
+        <p class="text-slate-300 mb-6">
+          "作为一名独立音乐人，基米天堂给了我展示作品的平台，并让我结识了许多有才华的合作者。"</p>
+        <div class="flex items-center">
+          <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mr-3">
+            <i class="fas fa-user text-white"></i>
+          </div>
+          <div>
+            <div class="font-medium">随便编的</div>
+            <div class="text-sm text-slate-400">独立歌手</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-700/30 rounded-2xl p-6">
+        <div class="flex mb-4">
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+          <i class="fas fa-star text-yellow-400"></i>
+        </div>
+        <p class="text-slate-300 mb-6">"开源社区的力量真是太棒了！我可以直接参与开发，为平台添加我需要的功能。"</p>
+        <div class="flex items-center">
+          <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mr-3">
+            <i class="fas fa-user text-white"></i>
+          </div>
+          <div>
+            <div class="font-medium">随便编的</div>
+            <div class="text-sm text-slate-400">开发者和音乐爱好者</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- CTA区域 -->
 <section class="py-20 px-6 gradient-bg">
-    <div class="container mx-auto max-w-4xl text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-6">加入基米天堂社区</h2>
-        <p class="text-xl opacity-90 mb-10">发现和分享音乐艺术，与全球创作者和爱好者连接</p>
-        <div class="flex flex-col sm:flex-row justify-center gap-4">
-            <a href="#download" class="bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center">
-                <i class="fas fa-download mr-2"></i> 立即下载
-            </a>
-            <a href="https://github.com/HachimiWorld" target="_blank" class="bg-slate-900 text-white hover:bg-slate-800 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center">
-                <i class="fab fa-github mr-2"></i> GitHub贡献
-            </a>
-        </div>
+  <div class="container mx-auto max-w-4xl text-center">
+    <h2 class="text-3xl md:text-4xl font-bold mb-6">加入基米天堂社区</h2>
+    <p class="text-xl opacity-90 mb-10">发现和分享音乐艺术，与全球创作者和爱好者连接</p>
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <a href="#download"
+         class="bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center">
+        <i class="fas fa-download mr-2"></i> 立即下载
+      </a>
+      <a href="https://github.com/HachimiWorld" target="_blank"
+         class="bg-slate-900 text-white hover:bg-slate-800 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center">
+        <i class="fab fa-github mr-2"></i> GitHub贡献
+      </a>
     </div>
+  </div>
 </section>
 
 <!-- 页脚 -->
 <footer class="py-12 px-6 bg-slate-900">
-    <div class="container mx-auto max-w-6xl">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-                <div class="flex items-center mb-6">
-                    <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center mr-3">
-                        <i class="fas fa-music text-white"></i>
-                    </div>
-                    <span class="text-xl font-bold">基米天堂</span>
-                </div>
-                <p class="text-slate-400">发现和分享音乐艺术的开源社区平台，由社区为爱发电驱动。</p>
-            </div>
-
-            <div>
-                <h3 class="text-lg font-semibold mb-6">下载</h3>
-                <ul class="space-y-3">
-                    <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Mac OS客户端</a></li>
-                    <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Windows客户端</a></li>
-                    <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Linux客户端</a></li>
-                    <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Android客户端</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h3 class="text-lg font-semibold mb-6">资源</h3>
-                <ul class="space-y-3">
-                    <li><a target="_blank" href="https://github.com/HachimiWorld" class="text-slate-400 hover:text-primary transition-colors">文档</a></li>
-                    <li><a target="_blank" href="https://github.com/HachimiWorld" class="text-slate-400 hover:text-primary transition-colors">API</a></li>
-                    <li><a target="_blank" href="https://github.com/HachimiWorld" class="text-slate-400 hover:text-primary transition-colors">开发指南</a></li>
-                    <li><a target="_blank" href="https://github.com/HachimiWorld" class="text-slate-400 hover:text-primary transition-colors">贡献指南</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h3 class="text-lg font-semibold mb-6">联系我们</h3>
-                <ul class="space-y-3">
-                    <li><a href="#" class="text-slate-400 hover:text-primary transition-colors">反馈建议</a></li>
-                    <li><a href="#" class="text-slate-400 hover:text-primary transition-colors">社区论坛</a></li>
-                    <li><a href="#" class="text-slate-400 hover:text-primary transition-colors">社交媒体</a></li>
-                    <li><a target="_blank" href="https://github.com/HachimiWorld" class="text-slate-400 hover:text-primary transition-colors">GitHub仓库</a></li>
-                </ul>
-            </div>
+  <div class="container mx-auto max-w-6xl">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <div class="flex items-center mb-6">
+          <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center mr-3">
+            <i class="fas fa-music text-white"></i>
+          </div>
+          <span class="text-xl font-bold">基米天堂</span>
         </div>
+        <p class="text-slate-400">发现和分享音乐艺术的开源社区平台，由社区为爱发电驱动。</p>
+      </div>
 
-        <div class="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <div class="text-slate-500 text-sm mb-4 md:mb-0">© 2025 基米天堂. Open Source Project licenced on AGPLv3.</div>
-            <div class="flex space-x-4">
-                <!--                <a href="#" class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-twitter"></i></a>-->
-                <a href="https://discord.gg/v6hceWYg" class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-discord"></i></a>
-                <!--                <a href="#" class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-instagram"></i></a>-->
-                <a target="_blank" href="https://github.com/HachimiWorld" class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-github"></i></a>
-            </div>
-        </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-6">下载</h3>
+        <ul class="space-y-3">
+          <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Mac OS客户端</a></li>
+          <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Windows客户端</a></li>
+          <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Linux客户端</a></li>
+          <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Android客户端</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold mb-6">资源</h3>
+        <ul class="space-y-3">
+<!--          <li><a target="_blank" href="https://github.com/HachimiWorld"
+                 class="text-slate-400 hover:text-primary transition-colors">文档</a></li>
+          <li><a target="_blank" href="https://github.com/HachimiWorld"
+                 class="text-slate-400 hover:text-primary transition-colors">API</a></li>
+          <li><a target="_blank" href="https://github.com/HachimiWorld"
+                 class="text-slate-400 hover:text-primary transition-colors">开发指南</a></li>-->
+          <li><a target="_blank" href="https://github.com/HachimiWorld"
+                 class="text-slate-400 hover:text-primary transition-colors">贡献指南</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold mb-6">联系我们</h3>
+        <ul class="space-y-3">
+          <li><a href="https://github.com/HachimiWorld/hachimi-world-client/issues/new" class="text-slate-400 hover:text-primary transition-colors">反馈建议</a></li>
+          <li><a href="https://github.com/HachimiWorld/hachimi-world-client/discussions" class="text-slate-400 hover:text-primary transition-colors">社区论坛</a></li>
+          <li><a href="#" class="text-slate-400 hover:text-primary transition-colors">社交媒体</a></li>
+          <li><a target="_blank" href="https://github.com/HachimiWorld"
+                 class="text-slate-400 hover:text-primary transition-colors">GitHub仓库</a></li>
+        </ul>
+      </div>
     </div>
+
+    <div class="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+      <div class="text-slate-500 text-sm mb-4 md:mb-0">© 2025 基米天堂. Open Source Project licenced on AGPLv3.</div>
+      <div class="flex space-x-4">
+        <!--                <a href="#" class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-twitter"></i></a>-->
+        <a href="https://discord.gg/v6hceWYg" class="text-slate-500 hover:text-primary transition-colors"><i
+          class="fab fa-discord"></i></a>
+        <!--                <a href="#" class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-instagram"></i></a>-->
+        <a target="_blank" href="https://github.com/HachimiWorld"
+           class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-github"></i></a>
+      </div>
+    </div>
+  </div>
 </footer>
 </body>
 </html>
