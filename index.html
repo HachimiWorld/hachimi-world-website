@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>基米天堂（建设中） - 发现和分享哈基米艺术的开源社区</title>
+  <title>基米天堂（建设中） - 发现和分享哈基米音乐的开源社区</title>
   <link rel="icon" href="/favicon.ico">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.4.5/mobile-detect.min.js"></script>
+<!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.4.5/mobile-detect.min.js"></script>-->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
   <script>
     tailwind.config = {
@@ -31,37 +31,39 @@
       }
     }
     window.onload = async () => {
-      const md = new MobileDetect(window.navigator.userAgent);
-      if (!md.mobile() && !md.tablet()) {
-        // Show
-        document.getElementById('web-app').style.display = 'block'
-      }
-      await Promise.all([
-        fetchVersion('windows'),
-        fetchVersion('android'),
-        fetchVersion('macos'),
-        fetchVersion('linux')
-      ])
+      await fetchVersion(['windows', 'macos', 'linux', 'android', 'ios'])
     }
 
-    async function fetchVersion(platform) {
-      const variant = "release-" + platform
-      const resp = await fetch(new Request('https://api.hachimi.world/version/latest?variant=' + variant))
+    async function fetchVersion(platforms) {
+      const variants = platforms.map(p => "release-" + p)
+      const resp = await fetch('https://api.hachimi.world/version/latest_batch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({variants})
+      })
       const data = await resp.json()
       if (data.ok) {
-        const id = '#version-' + platform
-        const downloadId = '#download-' + platform
-        const timeId = '#release-time-' + platform
-        document.querySelector(id).textContent = data.data.version_name
-        document.querySelector(downloadId).href = data.data.url
-        document.querySelector(timeId).textContent = new Date(data.data.release_time).toLocaleString('zh-CN', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        })
+        for (let platform of platforms) {
+          const variant = "release-" + platform
+          const versionData = data.data.find(v => v.variant === variant)
+          if (!versionData) continue
+
+          const id = '#version-' + platform
+          const downloadId = '#download-' + platform
+          const timeId = '#release-time-' + platform
+          document.querySelector(id).textContent = versionData.version_name
+          document.querySelector(downloadId).href = versionData.url
+          document.querySelector(timeId).textContent = new Date(versionData.release_time).toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          })
+        }
       } else {
         console.log(data.data.msg)
       }
@@ -132,14 +134,12 @@
       <div class="md mb-12 md:mb-0">
         <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
           发现和分享你喜爱的
-          <span class="bg-clip-text text-transparent gradient-bg">哈基米艺术</span>
+          <span class="bg-clip-text text-transparent gradient-bg">哈基米音乐</span>
         </h1>
         <p class="text-xl text-slate-300 mb-8">
           一个由社区为爱发电驱动的开源音乐平台<br>
         </p>
-        <p class="text-l text-slate-300 mb-8">
-          听音乐我只听哈基米音乐
-        </p>
+
         <div class="flex flex-wrap gap-4" style="z-index: 999">
           <a href="#download"
              class="bg-primary hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors flex items-center">
@@ -176,7 +176,7 @@
           <i class="fas fa-compass text-2xl text-white"></i>
         </div>
         <h3 class="text-xl font-semibold mb-3">探索艺术</h3>
-        <p class="text-slate-300">在我们专为哈基米艺术定制的社区里探索你喜爱的作品。</p>
+        <p class="text-slate-300">在我们专为哈基米音乐定制的社区里探索你喜爱的作品</p>
       </div>
 
       <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
@@ -184,7 +184,7 @@
           <i class="fas fa-microphone-alt text-2xl text-white"></i>
         </div>
         <h3 class="text-xl font-semibold mb-3">成为神人</h3>
-        <p class="text-slate-300">上传和分享你的哈基米作品，成为哈基米艺术的引导者，与志同道合的音乐人合作。</p>
+        <p class="text-slate-300">分享你的哈基米作品，与志同道合的音乐人合作，成为哈基米文化的引领者</p>
       </div>
 
       <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
@@ -192,7 +192,7 @@
           <i class="fas fa-heart text-2xl text-white"></i>
         </div>
         <h3 class="text-xl font-semibold mb-3">社区驱动</h3>
-        <p class="text-slate-300">完全由爱好者开发和维护的开源平台，所有功能都围绕你的需求设计，不包含任何商业内容。</p>
+        <p class="text-slate-300">完全由爱好者开发维护的开源平台，所有功能都围绕实际需求设计，不包含任何商业内容</p>
       </div>
     </div>
   </div>
@@ -217,23 +217,6 @@
         </p>
         <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-windows" class="text-xs">...</span></p>
         <a id="download-windows" target="_blank">
-          <button
-            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
-            <i class="fas fa-download mr-2"></i> 下载
-          </button>
-        </a>
-      </div>
-
-      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-          <i class="fab fa-android text-3xl text-white"></i>
-        </div>
-        <h3 class="text-lg font-semibold mb-2">Android</h3>
-        <p class="text-slate-300 text-sm mb-2">Android 9.0 及以上版本</p>
-        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-android" class="text-xs">...</span>
-        </p>
-        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-android" class="text-xs">...</span></p>
-        <a id="download-android" target="_blank">
           <button
             class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
             <i class="fas fa-download mr-2"></i> 下载
@@ -275,9 +258,42 @@
 
       <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
         <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
+          <i class="fab fa-android text-3xl text-white"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">Android</h3>
+        <p class="text-slate-300 text-sm mb-2">Android 9.0 及以上版本</p>
+        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-android" class="text-xs">...</span>
+        </p>
+        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-android" class="text-xs">...</span></p>
+        <a id="download-android" target="_blank">
+          <button
+            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
+            <i class="fas fa-download mr-2"></i> 下载
+          </button>
+        </a>
+      </div>
+
+      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
+        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
           <i class="fab fa-apple text-3xl text-white"></i>
         </div>
         <h3 class="text-lg font-semibold mb-2">iOS</h3>
+        <p class="text-slate-300 text-sm mb-2">IPA 包自行签名安装</p>
+        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-ios" class="text-xs">...</span></p>
+        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-ios" class="text-xs">...</span></p>
+        <a id="download-ios" target="_blank">
+          <button
+            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
+            <i class="fas fa-download mr-2"></i> 下载
+          </button>
+        </a>
+      </div>
+
+      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
+        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
+          <i class="fab text-3xl text-white"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">HarmonyOS</h3>
         <p class="text-slate-300 text-sm mb-2">敬请期待</p>
       </div>
 
@@ -367,7 +383,7 @@
 <section class="py-20 px-6 gradient-bg">
   <div class="container mx-auto max-w-4xl text-center">
     <h2 class="text-3xl md:text-4xl font-bold mb-6">加入基米天堂社区</h2>
-    <p class="text-xl opacity-90 mb-10">发现和分享音乐艺术，与全球创作者和爱好者连接</p>
+    <p class="text-xl opacity-90 mb-10">发现和分享哈基米音乐，连接全世界的创作者和爱好者</p>
     <div class="flex flex-col sm:flex-row justify-center gap-4">
       <a href="#download"
          class="bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center">
@@ -392,7 +408,7 @@
           </div>
           <span class="text-xl font-bold">基米天堂</span>
         </div>
-        <p class="text-slate-400">发现和分享音乐艺术的开源社区平台，由社区为爱发电驱动。</p>
+        <p class="text-slate-400">发现和分享哈基米音乐的开源平台，由社区为爱发电驱动</p>
       </div>
 
       <div>
@@ -422,7 +438,7 @@
       <div>
         <h3 class="text-lg font-semibold mb-6">联系我们</h3>
         <ul class="space-y-3">
-          <li><a href="https://github.com/HachimiWorld/hachimi-world-client/issues/new" class="text-slate-400 hover:text-primary transition-colors">反馈建议</a></li>
+          <li><a href="https://github.com/HachimiWorld/hachimi-world-client/issues/new?template=bug-%E6%8A%A5%E5%91%8A.md" class="text-slate-400 hover:text-primary transition-colors">反馈建议</a></li>
           <li><a href="https://github.com/HachimiWorld/hachimi-world-client/discussions" class="text-slate-400 hover:text-primary transition-colors">社区论坛</a></li>
           <li><a href="#" class="text-slate-400 hover:text-primary transition-colors">社交媒体</a></li>
           <li><a target="_blank" href="https://github.com/HachimiWorld"
