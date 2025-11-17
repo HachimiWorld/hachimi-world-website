@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>基米天堂</title>
   <link rel="icon" href="/favicon.ico">
-  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#FFF8F2" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#2B2625" media="(prefers-color-scheme: dark)">
@@ -12,33 +11,154 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
   <style>
+    :root {
+      --light-primary-color: #FF7022;
+      --dark-primary-color: #FF782F;
+      --light-bg: #FFF8F2;
+      --light-text: #333;
+      --light-card-bg: #FFFFFF;
+      --dark-bg: #2B2625;
+      --dark-text: #FFF;
+      --dark-card-bg: #3C3532;
+    }
+
     html, body {
       width: 100%;
       height: 100%;
       margin: 0;
       padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
     }
 
     @media (prefers-color-scheme: light) {
       body {
-        background-color: #EBE9E7;
-        color: #000;
+        background-color: var(--light-bg);
+        color: var(--light-text);
+      }
+      .song-card {
+        background-color: var(--light-card-bg);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      }
+      button {
+        background-color: #f0f0f0;
+        color: #333;
+      }
+      button.primary {
+        background-color: var(--light-primary-color);
+        color: white;
       }
     }
 
     @media (prefers-color-scheme: dark) {
       body {
-        background-color: #2B2625;
-        color: #fff;
+        background-color: var(--dark-bg);
+        color: var(--dark-text);
       }
+      .song-card {
+        background-color: var(--dark-card-bg);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      }
+      button {
+        background-color: #444;
+        color: white;
+      }
+      button.primary {
+        background-color: var(--dark-primary-color);
+        color: white;
+      }
+    }
+
+    .container {
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .song-card {
+      border-radius: 20px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      text-align: start;
+    }
+
+    .jmid {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-bottom: 1rem;
+    }
+
+    .song-cover {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 20px;
+      object-fit: cover;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .song-info {
+      text-align: left;
+    }
+
+    .song-info h1 {
+      font-size: 1.8rem;
+      margin: 0;
+    }
+
+    .song-info h2 {
+      font-size: 1.2rem;
+      font-weight: normal;
+      color: #888;
+      margin: 0.5rem 0;
+    }
+
+    .song-info .artist {
+      font-size: 1rem;
+      margin: 1rem 0 0;
+    }
+
+    .actions {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    button {
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-weight: bold;
+    }
+
+    .message-box {
+      padding: 1rem;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    @media (prefers-color-scheme: light) {
+        .message-box {
+            background-color: var(--light-card-bg);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .message-box {
+            background-color: var(--dark-card-bg);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
     }
   </style>
   <script>
     window.onload = async () => {
-      // https://hachimi.world/song/jm-abcd-123
-      // Get the jmid
-      // Get from path-last part, or from id query
       const jmid = getJmidFromUrl()
       console.log('jmid', jmid)
       if (jmid == null) {
@@ -56,6 +176,8 @@
       }
       console.log('data', data)
 
+      document.getElementById('loading').style.display = 'none';
+
       if (!data.ok) {
         if (data.data.code === "not_found") {
           showErrorMessage("没有找到这首歌")
@@ -65,10 +187,9 @@
         return
       }
 
-      // Set window title to song title
       document.title = `${data.data.title} by ${data.data.uploader_name} - 基米天堂`
 
-      document.getElementById('jmid').innerText = data.data.display_id
+      document.getElementById('jmid-value').innerText = data.data.display_id
       document.getElementById('cover').src = data.data.cover_url
       document.getElementById('title').innerText = data.data.title
       document.getElementById('subtitle').innerText = data.data.subtitle
@@ -92,6 +213,7 @@
     }
 
     function showErrorMessage(msg) {
+      document.getElementById('loading').style.display = 'none';
       const errBox = document.getElementById('error')
       errBox.innerText = msg
       errBox.style.display = 'block';
@@ -105,19 +227,27 @@
   </script>
 </head>
 <body>
-<!--<div id="content" style="display: none">-->
-<div id="content">
-  <div id="jmid">JM-ABCD-123</div>
-  <img id="cover" alt="歌曲封面">
-  <div id="title">歌曲标题</div>
-  <div id="subtitle">副标题</div>
-  <div>
-    作者：<div id="author">作者</div>
+<div class="container">
+  <div id="content" style="display: none;">
+    <a href="https://hachimi.world" target="_blank">
+      <img src="static/logo-dark.svg">
+    </a>
+    <div class="song-card">
+      <p class="jmid"><span id="jmid-value">JM-ABCD-123</span></p>
+      <img id="cover" alt="歌曲封面" class="song-cover">
+      <div class="song-info">
+        <h1 id="title">歌曲标题</h1>
+        <h2 id="subtitle">副标题</h2>
+        <p class="artist">作者：<span id="author">作者</span></p>
+      </div>
+      <div class="actions">
+        <button class="primary">打开基米天堂</button>
+        <button>在网页端收听</button>
+      </div>
+    </div>
   </div>
-  <button>打开客户端</button>
-  <button>进入网页端播放</button>
+  <div id="error" class="message-box" style="display: none;"></div>
+  <div id="loading" class="message-box" style="display: block;">正在加载...</div>
 </div>
-<div id="error" style="display: none"></div>
-<div id="loading" style="display: block"></div>
 </body>
 </html>
