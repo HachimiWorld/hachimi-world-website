@@ -178,6 +178,33 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       }
     }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 220px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px 0;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -110px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
   </style>
   <script>
     let jmid = null;
@@ -250,7 +277,7 @@
     }
 
     function openClient() {
-
+      window.open('https://hachimi.world/#download', '_self')
     }
 
     function openWebClient() {
@@ -280,8 +307,11 @@
         </div>
       </div>
       <div class="actions">
-        <button onclick="openClient()" class="primary">打开客户端</button>
-        <button onclick="openWebClient()">在网页端收听</button>
+        <button onclick="openClient()" class="primary">下载客户端</button>
+        <div class="tooltip">
+          <button onclick="openWebClient()" style="width: 100%;">在网页端收听</button>
+          <span class="tooltiptext">网页端为实验性功能，仅支持部分浏览器，若无法访问请使用 Google Chrome 浏览器</span>
+        </div>
       </div>
     </div>
   </div>
