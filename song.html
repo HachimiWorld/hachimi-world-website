@@ -39,14 +39,17 @@
         background-color: var(--light-bg);
         color: var(--light-text);
       }
+
       .song-card {
         background-color: var(--light-card-bg);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       }
+
       button {
         background-color: #f0f0f0;
         color: #333;
       }
+
       button.primary {
         background-color: var(--light-primary-color);
         color: white;
@@ -58,14 +61,17 @@
         background-color: var(--dark-bg);
         color: var(--dark-text);
       }
+
       .song-card {
         background-color: var(--dark-card-bg);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       }
+
       button {
         background-color: #444;
         color: white;
       }
+
       button.primary {
         background-color: var(--dark-primary-color);
         color: white;
@@ -96,27 +102,32 @@
       border-radius: 20px;
       object-fit: cover;
       margin-bottom: 1.5rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
 
     .song-info {
       text-align: left;
     }
 
-    .song-info h1 {
-      font-size: 1.8rem;
+    .song-info #title {
+      font-size: 20px;
       margin: 0;
     }
 
-    .song-info h2 {
-      font-size: 1.2rem;
+    .song-info #subtitle {
+      font-size: 14px;
       font-weight: normal;
       color: #888;
       margin: 0.5rem 0;
     }
 
     .song-info .artist {
-      font-size: 1rem;
+      font-size: 12px;
+      margin: 1rem 0 0;
+    }
+
+    .song-info .play-count {
+      font-size: 12px;
       margin: 1rem 0 0;
     }
 
@@ -129,9 +140,9 @@
 
     button {
       border: none;
-      padding: 1rem;
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 16px;
+      padding: 12px 32px;
       cursor: pointer;
       transition: background-color 0.2s;
       font-weight: bold;
@@ -141,25 +152,38 @@
       padding: 1rem;
       border-radius: 10px;
       font-size: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .row {
+      display: flex;
+    }
+
+    .row .artist {
+      flex-grow: 1;
     }
 
     @media (prefers-color-scheme: light) {
-        .message-box {
-            background-color: var(--light-card-bg);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
+      .message-box {
+        background-color: var(--light-card-bg);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
     }
 
     @media (prefers-color-scheme: dark) {
-        .message-box {
-            background-color: var(--dark-card-bg);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
+      .message-box {
+        background-color: var(--dark-card-bg);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
     }
   </style>
   <script>
+    let jmid = null;
+
     window.onload = async () => {
-      const jmid = getJmidFromUrl()
+      jmid = getJmidFromUrl()
       console.log('jmid', jmid)
       if (jmid == null) {
         showErrorMessage("参数错误")
@@ -194,6 +218,7 @@
       document.getElementById('title').innerText = data.data.title
       document.getElementById('subtitle').innerText = data.data.subtitle
       document.getElementById('author').innerText = data.data.uploader_name
+      document.getElementById('play-count').innerText = data.data.play_count
       let content = document.getElementById('content')
       content.style.display = 'block';
     }
@@ -214,9 +239,8 @@
 
     function showErrorMessage(msg) {
       document.getElementById('loading').style.display = 'none';
-      const errBox = document.getElementById('error')
-      errBox.innerText = msg
-      errBox.style.display = 'block';
+      document.getElementById('error-content').innerText = msg;
+      document.getElementById('error').style.display = 'block';
     }
 
     function checkJmid(input) {
@@ -224,29 +248,47 @@
       const uppercase = input.toUpperCase()
       return uppercase.startsWith("JM-")
     }
+
+    function openClient() {
+
+    }
+
+    function openWebClient() {
+      window.open(`https://hachimi.world/app/#/song/${jmid}`, '_self')
+    }
+
+    function openHome() {
+      window.open('https://hachimi.world', '_self')
+    }
   </script>
 </head>
 <body>
 <div class="container">
+  <a href="https://hachimi.world" target="_blank">
+    <img src="/static/logo-dark.svg">
+  </a>
   <div id="content" style="display: none;">
-    <a href="https://hachimi.world" target="_blank">
-      <img src="static/logo-dark.svg">
-    </a>
     <div class="song-card">
       <p class="jmid"><span id="jmid-value">JM-ABCD-123</span></p>
       <img id="cover" alt="歌曲封面" class="song-cover">
       <div class="song-info">
-        <h1 id="title">歌曲标题</h1>
-        <h2 id="subtitle">副标题</h2>
-        <p class="artist">作者：<span id="author">作者</span></p>
+        <div id="title">歌曲标题</div>
+        <div id="subtitle">副标题</div>
+        <div class="row">
+          <p class="artist">by <span id="author">作者</span></p>
+          <p class="play-count"><span id="play-count"></span> 播放</p>
+        </div>
       </div>
       <div class="actions">
-        <button class="primary">打开基米天堂</button>
-        <button>在网页端收听</button>
+        <button onclick="openClient()" class="primary">打开客户端</button>
+        <button onclick="openWebClient()">在网页端收听</button>
       </div>
     </div>
   </div>
-  <div id="error" class="message-box" style="display: none;"></div>
+  <div id="error" class="message-box" style="display: none;">
+    <p id="error-content"></p>
+    <button onclick="openHome()" class="primary">前往基米天堂收听更多哈基米音乐</button>
+  </div>
   <div id="loading" class="message-box" style="display: block;">正在加载...</div>
 </div>
 </body>
