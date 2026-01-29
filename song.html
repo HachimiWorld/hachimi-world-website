@@ -292,7 +292,11 @@
 <body>
 <div class="container">
   <a href="https://hachimi.world" target="_blank">
-    <img src="/static/logo-dark.svg">
+    <picture>
+      <source srcset="/static/logo-light.svg" media="(prefers-color-scheme: light)">
+      <source srcset="/static/logo-dark.svg" media="(prefers-color-scheme: dark)">
+      <img src="/static/logo-dark.svg">
+    </picture>
   </a>
   <div id="content" style="display: none;">
     <div class="song-card">
