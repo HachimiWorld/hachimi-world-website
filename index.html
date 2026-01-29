@@ -4,6 +4,67 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>基米天堂（建设中） - 发现和分享哈基米音乐的开源社区</title>
+
+  <!-- SEO: description, keywords, canonical, language alternates, author, robots -->
+  <meta name="description" content="基米天堂 — 一个由社区驱动的开源音乐平台，专注于发现与分享哈基米音乐，连接创作者与爱好者。下载客户端、加入社区、贡献代码。">
+  <meta name="keywords" content="哈基米, 基米天堂, 开源音乐, 音乐社区, Hachimi, music, open source">
+  <meta name="author" content="HachimiWorld">
+  <link rel="canonical" href="https://hachimi.world/">
+  <link rel="alternate" href="https://hachimi.world/" hreflang="zh-CN">
+  <link rel="alternate" href="https://hachimi.world/en/" hreflang="en">
+  <meta name="robots" content="index,follow">
+  <meta name="googlebot" content="index,follow">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="基米天堂">
+  <meta property="og:title" content="基米天堂（建设中） - 发现和分享哈基米音乐的开源社区">
+  <meta property="og:description" content="基米天堂 — 一个由社区驱动的开源音乐平台，专注于发现与分享哈基米音乐，连接创作者与爱好者。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hachimi.world/">
+  <meta property="og:image" content="https://hachimi.world/static/og-image.png">
+  <meta property="og:locale" content="zh_CN">
+
+  <!-- Twitter Card -->
+  <!--<meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@HachimiWorld">
+  <meta name="twitter:title" content="基米天堂（建设中） - 发现和分享哈基米音乐的开源社区">
+  <meta name="twitter:description" content="基米天堂 — 一个由社区驱动的开源音乐平台，专注于发现与分享哈基米音乐。">
+  <meta name="twitter:image" content="https://hachimi.world/static/og-image.png">-->
+
+  <!-- Theme colors for browsers / PWA -->
+  <meta name="theme-color" content="#FF7022" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1e293b" media="(prefers-color-scheme: dark)">
+
+  <!-- Structured data: WebSite + Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "url": "https://hachimi.world/",
+        "name": "基米天堂",
+        "description": "发现和分享哈基米音乐的开源社区",
+        "publisher": {
+          "@type": "Organization",
+          "name": "HachimiWorld",
+          "url": "https://hachimi.world/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://hachimi.world/static/logo-dark.svg"
+          }
+        }
+      },
+      {
+        "@type": "Organization",
+        "name": "HachimiWorld",
+        "url": "https://hachimi.world/",
+        "logo": "https://hachimi.world/static/logo-dark.svg"
+      }
+    ]
+  }
+  </script>
+
   <link rel="icon" href="/favicon.ico">
   <script src="https://cdn.tailwindcss.com"></script>
 <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.4.5/mobile-detect.min.js"></script>-->
@@ -110,7 +171,7 @@
           <i class="fas fa-music text-white"></i>
       </div>
       <span class="text-xl font-bold bg-clip-text text-transparent gradient-bg">基米天堂</span>-->
-      <img src="static/logo-dark.svg"/>
+      <img src="static/logo-dark.svg" alt="基米天堂 标志" />
     </div>
 
     <div class="hidden md:flex space-x-8">
@@ -126,6 +187,14 @@
     </a>
   </div>
 </nav>
+
+<!-- 关于（补充：用于锚点链接，解决 lint 警告） -->
+<section id="about" class="py-16 px-6 bg-slate-900 text-slate-300">
+  <div class="container mx-auto max-w-4xl text-center">
+    <h2 class="text-2xl font-bold mb-4">关于基米天堂</h2>
+    <p class="max-w-2xl mx-auto">基米天堂是一个由社区驱动的开源音乐项目，致力于发现与分享哈基米音乐，连接创作者与爱好者。欢迎参与贡献和反馈。</p>
+  </div>
+</section>
 
 <!-- 首屏区域 -->
 <section class="hero-pattern pt-32 pb-20 px-6">
@@ -448,7 +517,7 @@
     </div>
 
     <div class="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-      <div class="text-slate-500 text-sm mb-4 md:mb-0">© 2025 基米天堂. Open Source Project licenced under AGPLv3.</div>
+      <div class="text-slate-500 text-sm mb-4 md:mb-0">© 2026 基米天堂. Open Source Project licenced under AGPLv3.</div>
       <div class="flex space-x-4">
         <!--                <a href="#" class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-twitter"></i></a>-->
         <a href="https://discord.gg/KGBaW8SwBF" class="text-slate-500 hover:text-primary transition-colors"><i
