@@ -1,32 +1,33 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>基米天堂（建设中） - 发现和分享哈基米音乐的开源社区</title>
+  <title>Hachimi World (WIP) - An open-source community to discover and share Hachimi music</title>
 
-  <!-- SEO: description, keywords, canonical, language alternates, author, robots -->
+  <!-- SEO -->
   <meta name="description"
-        content="基米天堂 — 一个由社区驱动的开源音乐平台，专注于发现与分享哈基米音乐，连接创作者与爱好者。下载客户端、加入社区、贡献代码。">
-  <meta name="keywords" content="哈基米, 基米天堂, 开源音乐, 音乐社区, Hachimi, music, open source">
+        content="Hachimi World — a community-driven open-source music project focused on discovering and sharing Hachimi music, connecting creators and fans.">
+  <meta name="keywords" content="Hachimi, Hachimi World, open source, music, community">
   <meta name="author" content="HachimiWorld">
-  <link rel="canonical" href="https://hachimi.world/">
+  <link rel="canonical" href="https://hachimi.world/en/">
   <link rel="alternate" href="https://hachimi.world/" hreflang="zh-CN">
   <link rel="alternate" href="https://hachimi.world/en/" hreflang="en">
   <meta name="robots" content="index,follow">
   <meta name="googlebot" content="index,follow">
 
   <!-- Open Graph -->
-  <meta property="og:site_name" content="基米天堂">
-  <meta property="og:title" content="基米天堂（建设中） - 发现和分享哈基米音乐的开源社区">
+  <meta property="og:site_name" content="Hachimi World">
+  <meta property="og:title"
+        content="Hachimi World (WIP) - An open-source community to discover and share Hachimi music">
   <meta property="og:description"
-        content="基米天堂 — 一个由社区驱动的开源音乐平台，专注于发现与分享哈基米音乐，连接创作者与爱好者。">
+        content="Hachimi World — a community-driven open-source music project focused on discovering and sharing Hachimi music, connecting creators and fans.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://hachimi.world/">
+  <meta property="og:url" content="https://hachimi.world/en/">
   <meta property="og:image" content="https://hachimi.world/static/og-image.png">
-  <meta property="og:locale" content="zh_CN">
+  <meta property="og:locale" content="en_US">
 
-  <!-- Theme colors for browsers / PWA -->
+  <!-- Theme colors -->
   <meta name="theme-color" content="#FF7022" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#2B2A25" media="(prefers-color-scheme: dark)">
 
@@ -37,9 +38,9 @@
       "@graph": [
         {
           "@type": "WebSite",
-          "url": "https://hachimi.world/",
-          "name": "基米天堂",
-          "description": "发现和分享哈基米音乐的开源社区",
+          "url": "https://hachimi.world/en/",
+          "name": "Hachimi World",
+          "description": "A community-driven open-source music project",
           "publisher": {
             "@type": "Organization",
             "name": "HachimiWorld",
@@ -90,7 +91,7 @@
 
             if (versionEl) versionEl.textContent = versionData.version_name
             if (downloadEl) downloadEl.href = versionData.url
-            if (timeEl) timeEl.textContent = new Date(versionData.release_time).toLocaleString('zh-CN', {
+            if (timeEl) timeEl.textContent = new Date(versionData.release_time).toLocaleString('en-US', {
               year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
             })
           }
@@ -101,6 +102,11 @@
     }
   </script>
 
+  <!--
+    NOTE:
+    - This page intentionally reuses the same inline CSS approach as /index.html.
+    - Keep class names / ids stable so shared JS (version fetch) keeps working.
+  -->
   <style>
     :root {
       /* ===== Theme tokens (match captcha.html) ===== */
@@ -556,19 +562,19 @@
   <div class="wrap nav-inner">
     <div class="brand">
       <picture>
-        <source srcset="static/logo-light.svg" media="(prefers-color-scheme: light)">
-        <source srcset="static/logo-dark.svg" media="(prefers-color-scheme: dark)">
-        <img src="static/logo-dark.svg" alt="基米天堂 标志">
+        <source srcset="/static/logo-light.svg" media="(prefers-color-scheme: light)">
+        <source srcset="/static/logo-dark.svg" media="(prefers-color-scheme: dark)">
+        <img src="/static/logo-dark.svg" alt="Hachimi World">
       </picture>
     </div>
     <div class="nav-links" role="navigation">
-      <a href="#features">特色</a>
-      <a href="#download">下载</a>
-      <a href="#community">社区</a>
-      <a href="#about">关于</a>
+      <a href="#features">Features</a>
+      <a href="#download">Download</a>
+      <a href="#community">Community</a>
+      <a href="#about">About</a>
     </div>
     <div class="nav-actions">
-      <a href="/en/" class="chip" title="Switch to English">EN</a>
+      <a href="/" class="chip" title="Switch to Chinese">中文</a>
       <a href="https://github.com/HachimiWorld" class="chip" target="_blank" rel="noopener"><i
         class="fab fa-github"></i> GitHub</a>
     </div>
@@ -580,60 +586,63 @@
   <section class="hero">
     <div class="wrap hero-grid">
       <div class="hero-card">
-        <div class="kicker"><i class="fas fa-bolt"></i> 社区驱动 · 开源 · 为爱发电</div>
-        <h1>发现和分享你喜爱的 <span class="highlight">哈基米音乐</span></h1>
-        <p>一个由社区为爱发电驱动的开源音乐平台</p>
+        <div class="kicker"><i class="fas fa-bolt"></i> Community-driven · Open Source · Built with
+          love
+        </div>
+        <h1>Discover and share your favorite <span class="highlight">Hachimi music</span></h1>
+        <p>An open-source music project made by the community.</p>
 
         <div class="actions">
-          <a href="#download" class="btn btn-primary"><i class="fas fa-download"></i> 立即下载</a>
-          <a href="#features" class="btn"><i class="fas fa-circle-info"></i> 了解更多</a>
-          <a href="/app/" class="btn"><i class="fas fa-globe"></i> 进入 Web 端（实验性）</a>
+          <a href="#download" class="btn btn-primary"><i class="fas fa-download"></i> Download</a>
+          <a href="#features" class="btn"><i class="fas fa-circle-info"></i> Learn more</a>
+          <a href="/app/" class="btn"><i class="fas fa-globe"></i> Web (Experimental)</a>
         </div>
 
         <div class="stats">
           <div class="stat">
             <div class="v">AGPLv3</div>
-            <div class="k">完全开源</div>
+            <div class="k">Fully open-source</div>
           </div>
           <div class="stat">
-            <div class="v">多平台</div>
+            <div class="v">Multi-platform</div>
             <div class="k">Win / macOS / Linux / Android / iOS</div>
           </div>
         </div>
       </div>
 
       <div class="hero-media">
-        <img src="static/screenshot-light.webp" alt="基米天堂 客户端截图">
+        <img src="/static/screenshot-light.webp" alt="Hachimi World client screenshot">
       </div>
     </div>
   </section>
-
 
   <!-- FEATURES -->
   <section id="features" class="section alt">
     <div class="wrap">
       <div class="section-head">
         <div>
-          <h2>为什么选择基米天堂</h2>
-          <p>我们为哈基米音乐创作者和爱好者打造了一个独特的开源音乐平台</p>
+          <h2>Why Hachimi World</h2>
+          <p>Built for creators and fans of Hachimi music — open, community-driven, and focused on
+            real needs.</p>
         </div>
       </div>
 
       <div class="grid-3">
         <div class="feature">
           <div class="icon"><i class="fas fa-compass"></i></div>
-          <h3>探索艺术</h3>
-          <p>在我们专为哈基米音乐定制的社区里探索你喜爱的作品</p>
+          <h3>Explore</h3>
+          <p>Discover Hachimi tracks and creators in a community tailored for this culture.</p>
         </div>
         <div class="feature">
           <div class="icon"><i class="fas fa-microphone-alt"></i></div>
-          <h3>成为神人</h3>
-          <p>分享你的哈基米作品，与志同道合的音乐人合作，成为哈基米文化的引领者</p>
+          <h3>Create</h3>
+          <p>Share your work, collaborate, and help shape the culture with people who get it.</p>
         </div>
         <div class="feature">
           <div class="icon"><i class="fas fa-heart"></i></div>
-          <h3>社区驱动</h3>
-          <p>完全由爱好者开发维护的开源平台，所有功能都围绕实际需求设计，不包含任何商业内容</p>
+          <h3>Community-first</h3>
+          <p>Fully open-source. No commercial content. Features are driven by real community
+            feedback.</p>
         </div>
       </div>
     </div>
@@ -644,8 +653,8 @@
     <div class="wrap">
       <div class="section-head">
         <div>
-          <h2>下载最新的基米天堂客户端</h2>
-          <p>基米天堂客户端通过 GitHub Actions 进行全自动构建</p>
+          <h2>Download the latest Hachimi World client</h2>
+          <p>All builds are produced automatically via GitHub Actions.</p>
         </div>
       </div>
 
@@ -653,13 +662,13 @@
         <div class="dl">
           <div class="dl-head">
             <div class="platform"><i class="fab fa-windows"></i> Windows</div>
-            <div class="badge">稳定版</div>
+            <div class="badge">Stable</div>
           </div>
-          <div class="dl-meta">系统：<span>Windows 10+</span></div>
-          <div class="dl-meta">发布时间：<span id="release-time-windows">...</span></div>
-          <div class="dl-meta">版本：<span id="version-windows">...</span></div>
+          <div class="dl-meta">OS: <span>Windows 10+</span></div>
+          <div class="dl-meta">Released: <span id="release-time-windows">...</span></div>
+          <div class="dl-meta">Version: <span id="version-windows">...</span></div>
           <a id="download-windows" class="dl-btn" target="_blank" href="#">
-            <button class="btn btn-wide"><i class="fas fa-download"></i> 下载</button>
+            <button class="btn btn-wide"><i class="fas fa-download"></i> Download</button>
           </a>
         </div>
 
@@ -668,11 +677,11 @@
             <div class="platform"><i class="fab fa-apple"></i> macOS</div>
             <div class="badge">Apple Silicon</div>
           </div>
-          <div class="dl-meta">芯片：<span>M 系列</span></div>
-          <div class="dl-meta">发布时间：<span id="release-time-macos">...</span></div>
-          <div class="dl-meta">版本：<span id="version-macos">...</span></div>
+          <div class="dl-meta">Chip: <span>M series</span></div>
+          <div class="dl-meta">Released: <span id="release-time-macos">...</span></div>
+          <div class="dl-meta">Version: <span id="version-macos">...</span></div>
           <a id="download-macos" class="dl-btn" target="_blank" href="#">
-            <button class="btn btn-wide"><i class="fas fa-download"></i> 下载</button>
+            <button class="btn btn-wide"><i class="fas fa-download"></i> Download</button>
           </a>
         </div>
 
@@ -681,11 +690,11 @@
             <div class="platform"><i class="fab fa-linux"></i> Linux</div>
             <div class="badge">DEB</div>
           </div>
-          <div class="dl-meta">发行版：<span>Ubuntu / Debian</span></div>
-          <div class="dl-meta">发布时间：<span id="release-time-linux">...</span></div>
-          <div class="dl-meta">版本：<span id="version-linux">...</span></div>
+          <div class="dl-meta">Distros: <span>Ubuntu / Debian</span></div>
+          <div class="dl-meta">Released: <span id="release-time-linux">...</span></div>
+          <div class="dl-meta">Version: <span id="version-linux">...</span></div>
           <a id="download-linux" class="dl-btn" target="_blank" href="#">
-            <button class="btn btn-wide"><i class="fas fa-download"></i> 下载</button>
+            <button class="btn btn-wide"><i class="fas fa-download"></i> Download</button>
           </a>
         </div>
 
@@ -694,38 +703,38 @@
             <div class="platform"><i class="fab fa-android"></i> Android</div>
             <div class="badge">APK</div>
           </div>
-          <div class="dl-meta">系统：<span>Android 9+</span></div>
-          <div class="dl-meta">发布时间：<span id="release-time-android">...</span></div>
-          <div class="dl-meta">版本：<span id="version-android">...</span></div>
+          <div class="dl-meta">OS: <span>Android 9+</span></div>
+          <div class="dl-meta">Released: <span id="release-time-android">...</span></div>
+          <div class="dl-meta">Version: <span id="version-android">...</span></div>
           <a id="download-android" class="dl-btn" target="_blank" href="#">
-            <button class="btn btn-wide"><i class="fas fa-download"></i> 下载</button>
+            <button class="btn btn-wide"><i class="fas fa-download"></i> Download</button>
           </a>
         </div>
 
         <div class="dl">
           <div class="dl-head">
             <div class="platform"><i class="fab fa-apple"></i> iOS</div>
-            <div class="badge">需自签</div>
+            <div class="badge">Sideload</div>
           </div>
-          <div class="dl-meta">格式：<span>IPA</span></div>
-          <div class="dl-meta">发布时间：<span id="release-time-ios">...</span></div>
-          <div class="dl-meta">版本：<span id="version-ios">...</span></div>
+          <div class="dl-meta">Format: <span>IPA</span></div>
+          <div class="dl-meta">Released: <span id="release-time-ios">...</span></div>
+          <div class="dl-meta">Version: <span id="version-ios">...</span></div>
           <a id="download-ios" class="dl-btn" target="_blank" href="#">
-            <button class="btn btn-wide"><i class="fas fa-download"></i> 下载</button>
+            <button class="btn btn-wide"><i class="fas fa-download"></i> Download</button>
           </a>
         </div>
 
         <div class="dl">
           <div class="dl-head">
             <div class="platform"><i class="fas fa-mobile-screen"></i> HarmonyOS</div>
-            <div class="badge">敬请期待</div>
+            <div class="badge">Coming soon</div>
           </div>
-          <div class="dl-meta">计划：<span>后续支持</span></div>
-          <div class="dl-meta">状态：<span>开发中</span></div>
-          <div class="dl-meta">版本：<span>—</span></div>
+          <div class="dl-meta">Plan: <span>Future support</span></div>
+          <div class="dl-meta">Status: <span>In development</span></div>
+          <div class="dl-meta">Version: <span>—</span></div>
           <a class="dl-btn" href="#">
             <button class="btn btn-wide" disabled style="opacity:.6; cursor:not-allowed;"><i
-              class="fas fa-hourglass"></i> 暂不可用
+              class="fas fa-hourglass"></i> Unavailable
             </button>
           </a>
         </div>
@@ -738,8 +747,8 @@
     <div class="wrap">
       <div class="section-head">
         <div>
-          <h2>社区的声音</h2>
-          <p>看看我们的用户如何评价基米天堂</p>
+          <h2>Community voices</h2>
+          <p>What people are saying about Hachimi World</p>
         </div>
       </div>
 
@@ -749,12 +758,13 @@
             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
             class="fas fa-star"></i><i class="fas fa-star"></i>
           </div>
-          <p>“开源模式让社区能真正塑造平台的发展方向，体验比我预期更完整。”</p>
+          <p>“Open-source governance means the community truly shapes the roadmap. It’s more
+            complete than I expected.”</p>
           <div class="who">
             <div class="avatar"><i class="fas fa-user"></i></div>
             <div>
-              <div class="name">随便编的</div>
-              <div class="role">电子音乐制作人</div>
+              <div class="name">(placeholder)</div>
+              <div class="role">Electronic music producer</div>
             </div>
           </div>
         </div>
@@ -764,12 +774,13 @@
             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
             class="fas fa-star"></i><i class="fas fa-star"></i>
           </div>
-          <p>“作为独立音乐人，我终于有个更愿意听我说话的地方。”</p>
+          <p>“As an independent musician, it’s refreshing to have a place that actually
+            listens.”</p>
           <div class="who">
             <div class="avatar"><i class="fas fa-user"></i></div>
             <div>
-              <div class="name">随便编的</div>
-              <div class="role">独立歌手</div>
+              <div class="name">(placeholder)</div>
+              <div class="role">Indie singer</div>
             </div>
           </div>
         </div>
@@ -779,12 +790,13 @@
             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
             class="fas fa-star"></i><i class="fas fa-star"></i>
           </div>
-          <p>“我能直接提 PR，把我想要的功能写进去，这才是社区。”</p>
+          <p>“I can open a PR and implement the feature myself — that’s what a real community feels
+            like.”</p>
           <div class="who">
             <div class="avatar"><i class="fas fa-user"></i></div>
             <div>
-              <div class="name">随便编的</div>
-              <div class="role">开发者 & 爱好者</div>
+              <div class="name">(placeholder)</div>
+              <div class="role">Developer & fan</div>
             </div>
           </div>
         </div>
@@ -792,21 +804,19 @@
     </div>
   </section>
 
-  <!-- ABOUT (merged section) -->
   <section id="about" class="section">
     <div class="wrap">
       <div class="about-block">
-
-        <div class="resource-groups" aria-label="项目入口">
+        <div class="resource-groups" aria-label="Project links">
           <div>
             <div class="pill-row">
               <a class="pill pill-primary" href="https://github.com/HachimiWorld" target="_blank"
                  rel="noopener">
-                <span><i class="fab fa-github"></i> 组织主页</span>
+                <span><i class="fab fa-github"></i> Organization</span>
               </a>
               <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client"
                  target="_blank" rel="noopener">
-                <span><i class="fas fa-code"></i> 仓库页</span>
+                <span><i class="fas fa-code"></i> Repository</span>
               </a>
             </div>
           </div>
@@ -816,12 +826,12 @@
               <a class="pill"
                  href="https://github.com/HachimiWorld/hachimi-world-client/issues/new/choose"
                  target="_blank" rel="noopener">
-                <span><i class="fas fa-bug"></i> 反馈 BUG</span>
+                <span><i class="fas fa-bug"></i> File an issue</span>
               </a>
               <a class="pill"
                  href="https://github.com/HachimiWorld/hachimi-world-client/discussions"
                  target="_blank" rel="noopener">
-                <span><i class="fas fa-comments"></i> 讨论</span>
+                <span><i class="fas fa-comments"></i> Discussions</span>
               </a>
             </div>
           </div>
@@ -837,16 +847,12 @@
       </div>
     </div>
   </section>
-
-  <!-- CTA (removed: merged into about) -->
 </main>
 
-<!-- Footer: replaced with single-line copyright as requested -->
 <footer>
   <div class="wrap" style="padding:28px 0; text-align:center; color:var(--muted-2);">
-    <small>© 2026 基米天堂 · Open Source Project licensed under AGPLv3.</small>
+    <small>© 2026 Hachimi World · Open Source Project licensed under AGPLv3.</small>
   </div>
 </footer>
-
 </body>
 </html>
