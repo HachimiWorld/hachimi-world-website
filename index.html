@@ -24,16 +24,9 @@
   <meta property="og:image" content="https://hachimi.world/static/og-image.png">
   <meta property="og:locale" content="zh_CN">
 
-  <!-- Twitter Card -->
-  <!--<meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:site" content="@HachimiWorld">
-  <meta name="twitter:title" content="基米天堂（建设中） - 发现和分享哈基米音乐的开源社区">
-  <meta name="twitter:description" content="基米天堂 — 一个由社区驱动的开源音乐平台，专注于发现与分享哈基米音乐。">
-  <meta name="twitter:image" content="https://hachimi.world/static/og-image.png">-->
-
   <!-- Theme colors for browsers / PWA -->
   <meta name="theme-color" content="#FF7022" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#1e293b" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#2B2A25" media="(prefers-color-scheme: dark)">
 
   <!-- Structured data: WebSite + Organization -->
   <script type="application/ld+json">
@@ -66,468 +59,764 @@
   </script>
 
   <link rel="icon" href="/favicon.ico">
-  <script src="https://cdn.tailwindcss.com"></script>
-<!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.4.5/mobile-detect.min.js"></script>-->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#FF7022',
-            secondary: '#1AA78D',
-            accent: '#ec4899',
-            dark: '#3b321e',
-          },
-          /*colors: {
-              primary: '#6366f1',
-              secondary: '#8b5cf6',
-              accent: '#ec4899',
-              dark: '#1e293b',
-          },*/
-          animation: {
-            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-          }
-        }
-      }
-    }
-    window.onload = async () => {
-      await fetchVersion(['windows', 'macos', 'linux', 'android', 'ios'])
-    }
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchVersion(['windows', 'macos', 'linux', 'android', 'ios']).catch(()=>{})
+    })
 
     async function fetchVersion(platforms) {
       const variants = platforms.map(p => "release-" + p)
-      const resp = await fetch('https://api.hachimi.world/version/latest_batch', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({variants})
-      })
-      const data = await resp.json()
-      if (data.ok) {
-        for (let platform of platforms) {
-          const variant = "release-" + platform
-          const versionData = data.data.find(v => v.variant === variant)
-          if (!versionData) continue
+      try {
+        const resp = await fetch('https://api.hachimi.world/version/latest_batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ variants })
+        })
+        const data = await resp.json()
+        if (data.ok) {
+          for (let platform of platforms) {
+            const variant = "release-" + platform
+            const versionData = data.data.find(v => v.variant === variant)
+            if (!versionData) continue
 
-          const id = '#version-' + platform
-          const downloadId = '#download-' + platform
-          const timeId = '#release-time-' + platform
-          document.querySelector(id).textContent = versionData.version_name
-          document.querySelector(downloadId).href = versionData.url
-          document.querySelector(timeId).textContent = new Date(versionData.release_time).toLocaleString('zh-CN', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-          })
+            const versionEl = document.getElementById('version-' + platform)
+            const downloadEl = document.getElementById('download-' + platform)
+            const timeEl = document.getElementById('release-time-' + platform)
+
+            if (versionEl) versionEl.textContent = versionData.version_name
+            if (downloadEl) downloadEl.href = versionData.url
+            if (timeEl) timeEl.textContent = new Date(versionData.release_time).toLocaleString('zh-CN', {
+              year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
+            })
+          }
         }
-      } else {
-        console.log(data.data.msg)
+      } catch (e) {
+        console.warn('fetchVersion failed', e)
       }
     }
   </script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+  <style>
+    :root {
+      /* ===== Theme tokens (match captcha.html) ===== */
+      --light-primary-color: #FF7022;
+      --dark-primary-color: #FF782F;
+      --light-bg: #EBE9E7;
+      --light-text: #333;
+      --light-card-bg: rgba(255, 255, 255, 0.6);
+      --dark-bg: #2B2A25;
+      --dark-text: #FFF;
+      --dark-card-bg: rgba(255, 255, 255, 0.07);
+
+      /* ===== Derived / runtime variables (default to dark) ===== */
+      --primary: var(--dark-primary-color);
+      --primary-2: var(--dark-primary-color);
+      --bg: var(--dark-bg);
+      --text: var(--dark-text);
+      --surface: var(--dark-card-bg);
+
+      /* extra surfaces/borders for this page */
+      --surface-2: rgba(255,255,255,0.10);
+      --border: rgba(255,255,255,0.10);
+
+      --muted: rgba(255,255,255,0.72);
+      --muted-2: rgba(255,255,255,0.55);
+
+      --shadow: 0 2px 16px rgba(0,0,0,0.06);
+      --shadow-strong: 0 18px 40px rgba(0,0,0,0.45);
+
+      --radius: 16px;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --primary: var(--light-primary-color);
+        --primary-2: var(--light-primary-color);
+        --bg: var(--light-bg);
+        --text: var(--light-text);
+        --surface: var(--light-card-bg);
+
+        --surface-2: rgba(255, 255, 255, 0.82);
+        --border: rgba(0,0,0,0.08);
+
+        --muted: rgba(51,51,51,0.75);
+        --muted-2: rgba(51,51,51,0.58);
+
+        --shadow: 0 10px 26px rgba(0,0,0,0.06);
+        --shadow-strong: 0 18px 44px rgba(0,0,0,0.10);
+      }
+
+      /* nav in light mode: use theme variables */
+      .nav {
+        background: color-mix(in srgb, var(--bg) 82%, transparent);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .chip { color: var(--text); }
+    }
+
+    /* Logo is handled by <picture> sources */
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
     body {
-      font-family: 'Inter', sans-serif;
-      scroll-behavior: smooth;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
       overflow-x: hidden;
     }
 
-    /*.gradient-bg {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
-    }*/
-    .gradient-bg {
-      background: linear-gradient(135deg, #FF7022 0%, #1AA78D 50%, #ec4899 100%);
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(1120px, 92vw); margin: 0 auto; }
+
+    /* NAV */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner { display:flex; align-items:center; justify-content:space-between; padding: 14px 0; gap: 12px; }
+    .brand { display:flex; align-items:center; gap: 12px; }
+    .brand img { height: 42px; display:block; }
+    .nav-links { display:none; gap: 20px; align-items:center; }
+    .nav-links a { color: var(--muted); font-weight: 600; font-size: 14px; letter-spacing: .2px; }
+    .nav-links a:hover { color: var(--primary); }
+
+    .nav-actions { display:flex; align-items:center; gap: 10px; }
+    .chip {
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 12px;
+      color: var(--text);
+      box-shadow: var(--shadow);
     }
 
-    .hero-pattern {
-      background-color: #1e293b;
-      /*background-color: #1e293b;*/
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    /* HERO */
+    .hero {
+      padding: 96px 0 28px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 22px;
+      align-items: center;
     }
 
-    .card-hover {
-      transition: all 0.3s ease;
+    .hero-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 22px;
+      box-shadow: var(--shadow);
     }
 
-    .card-hover:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    .kicker {
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--primary) 16%, transparent);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .hero h1 { margin: 14px 0 12px; font-size: 44px; line-height: 1.05; letter-spacing: -0.6px; }
+    .highlight { background: linear-gradient(90deg, var(--primary), var(--primary-2)); -webkit-background-clip:text; color: transparent; }
+    .hero p { margin: 0 0 18px; color: var(--muted); font-size: 16px; line-height: 1.6; }
+
+    .actions { display:flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:hover {
+      border-color: color-mix(in srgb, var(--border) 60%, var(--text) 12%);
+      background: var(--surface-2);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .stats {
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .stat {
+      padding: 12px;
+      border-radius: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .stat .v { font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+    .stat .k { color: var(--muted-2); font-size: 12px; }
+
+    .hero-media {
+      /* allow the image's own rounded corners to show */
+      border-radius: 0;
+      overflow: visible; /* image handles its own rounding */
+      border: none;
+      background: transparent;
+      box-shadow: var(--shadow-strong);
+    }
+    .hero-media img { width: 100%; display:block; }
+
+    /* BAND */
+    .band {
+      padding: 22px 0;
+    }
+    .band-inner {
+      display:flex;
+      gap: 14px;
+      align-items: stretch;
+      flex-wrap: wrap;
+    }
+    .band-item {
+      flex: 1 1 260px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display:flex;
+      gap: 12px;
+    }
+    .band-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display:flex; align-items:center; justify-content:center;
+      background: color-mix(in srgb, var(--primary) 16%, transparent);
+      border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .band-item h3 { margin: 2px 0 4px; font-size: 14px; }
+    .band-item p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    /* SECTION */
+    .section { padding: 54px 0; }
+    .section.alt {
+      background: color-mix(in srgb, var(--surface) 55%, transparent);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-head { display:flex; align-items:flex-end; justify-content:space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+    .section-head h2 { margin: 0; font-size: 22px; letter-spacing: -0.2px; }
+    .section-head p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+    /* FEATURES */
+    .grid-3 { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .feature {
+      padding: 16px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .feature .icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(90deg, var(--primary), var(--primary-2));
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .feature h3 { margin: 0 0 8px; font-size: 16px; }
+    .feature p { margin: 0; color: var(--muted); line-height: 1.6; }
+
+    /* DOWNLOAD */
+    .download-grid { display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .dl {
+      padding: 16px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      text-align: left;
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 190px;
+    }
+    .dl-head { display:flex; align-items:center; justify-content:space-between; gap: 10px; }
+    .dl-head .platform { font-weight: 800; }
+    .dl-head .badge {
+      background: color-mix(in srgb, var(--primary) 16%, transparent);
+      border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent);
+      color: var(--text);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .dl-meta { color: var(--muted-2); font-size: 12px; line-height: 1.5; }
+    .dl-meta span { color: var(--muted); }
+    .dl .dl-btn { margin-top: auto; }
+    .btn-wide { width: 100%; }
+
+    /* QUOTE */
+    .quotes { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .quote {
+      padding: 16px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .stars { display:flex; gap: 6px; margin-bottom: 10px; color: #fbbf24; }
+    .quote p { margin: 0 0 12px; color: var(--muted); line-height: 1.6; }
+    .who { display:flex; align-items:center; gap: 10px; }
+    .who .avatar { width: 40px; height: 40px; border-radius: 12px; display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
+    .who .name { font-weight: 800; }
+    .who .role { font-size: 12px; color: var(--muted-2); }
+
+    /* ABOUT / RESOURCES (single-column, no cards) */
+    .about-block {
+      padding: 20px;
+      border-radius: calc(var(--radius) + 4px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .about-block h2 { margin: 0 0 10px; font-size: 22px; letter-spacing: -0.2px; }
+    .about-block p { margin: 0; color: var(--muted); line-height: 1.7; max-width: 72ch; }
+
+    /* RESOURCE GROUPS */
+    .resource-groups { margin-top: 16px; display: grid; gap: 12px; }
+
+    .group-title {
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      color: rgba(255,255,255,0.88);
+      font-weight: 900;
+      letter-spacing: .2px;
+      margin-bottom: 10px;
+    }
+    .group-title i { color: rgba(255,112,34,0.95); }
+
+    .pill-row { display:flex; flex-wrap: wrap; gap: 10px; }
+    .pill {
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      white-space: nowrap;
+    }
+    .pill:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--border) 60%, var(--text) 12%); background: var(--surface-2); }
+
+    .pill-primary {
+      border: 1px solid color-mix(in srgb, var(--primary) 38%, transparent);
+      background: color-mix(in srgb, var(--primary) 18%, transparent);
+      color: var(--text);
+    }
+    .pill-primary:hover {
+      border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+      background: color-mix(in srgb, var(--primary) 24%, transparent);
+    }
+
+    /* Mobile pills layout (scoped to pills only) */
+    @media (max-width: 768px) {
+      .pill { width: 100%; justify-content: space-between; }
+      .pill-row { gap: 8px; }
+    }
+
+    /* RESPONSIVE (restore) */
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 38px; }
+      .download-grid { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .quotes { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
+    }
+
+    @media (min-width: 860px) {
+      .nav-links { display:flex; }
+    }
+
+    @media (max-width: 768px) {
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    /* FOOTER (redesign) */
+    footer {
+      padding: 34px 0 44px;
+      color: var(--muted-2);
+      border-top: 1px solid var(--border);
+      background: color-mix(in srgb, var(--surface) 25%, transparent);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr 0.9fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .footer-brand {
+      display: grid;
+      gap: 10px;
+    }
+    .footer-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      color: rgba(255,255,255,0.92);
+    }
+    .footer-logo img { height: 26px; display:block; }
+    .footer-desc { margin: 0; color: var(--muted); line-height: 1.7; max-width: 60ch; }
+
+    .footer-col h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      letter-spacing: .2px;
+      color: rgba(255,255,255,0.88);
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 8px;
+    }
+    .footer-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      padding: 6px 0;
+    }
+    .footer-links a:hover { color: var(--primary); }
+
+    .footer-bottom {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .footer-bottom small { color: var(--muted-2); }
+    .footer-mini {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .footer-mini a { color: var(--muted-2); }
+    .footer-mini a:hover { color: var(--primary); }
+
+    @media (max-width: 980px) {
+      .footer-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-<body class="bg-slate-900 text-white">
-<!-- 导航栏 -->
-<nav class="fixed w-full bg-slate-900/90 backdrop-blur-sm z-50 py-4 px-6 border-b border-slate-800">
-  <div class="container mx-auto flex justify-between items-center">
-    <div class="flex items-center">
-      <!--<div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mr-3">
-          <i class="fas fa-music text-white"></i>
+<body>
+  <nav class="nav">
+    <div class="wrap nav-inner">
+      <div class="brand">
+        <picture>
+          <source srcset="static/logo-light.svg" media="(prefers-color-scheme: light)">
+          <source srcset="static/logo-dark.svg" media="(prefers-color-scheme: dark)">
+          <img src="static/logo-dark.svg" alt="基米天堂 标志">
+        </picture>
       </div>
-      <span class="text-xl font-bold bg-clip-text text-transparent gradient-bg">基米天堂</span>-->
-      <img src="static/logo-dark.svg" alt="基米天堂 标志" />
-    </div>
-
-    <div class="hidden md:flex space-x-8">
-      <a href="#features" class="hover:text-primary transition-colors">特色</a>
-      <a href="#download" class="hover:text-primary transition-colors">下载</a>
-      <a href="#community" class="hover:text-primary transition-colors">社区</a>
-      <a href="#about" class="hover:text-primary transition-colors">关于</a>
-    </div>
-
-    <a href="https://github.com/HachimiWorld" target="_blank"
-       class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors flex items-center">
-      <i class="fab fa-github mr-2"></i> GitHub
-    </a>
-  </div>
-</nav>
-
-<!-- 关于（补充：用于锚点链接，解决 lint 警告） -->
-<section id="about" class="py-16 px-6 bg-slate-900 text-slate-300">
-  <div class="container mx-auto max-w-4xl text-center">
-    <h2 class="text-2xl font-bold mb-4">关于基米天堂</h2>
-    <p class="max-w-2xl mx-auto">基米天堂是一个由社区驱动的开源音乐项目，致力于发现与分享哈基米音乐，连接创作者与爱好者。欢迎参与贡献和反馈。</p>
-  </div>
-</section>
-
-<!-- 首屏区域 -->
-<section class="hero-pattern pt-32 pb-20 px-6">
-  <div class="container mx-auto max-w-6xl">
-    <div class="flex flex-col md:flex-row items-center">
-      <div class="md mb-12 md:mb-0">
-        <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
-          发现和分享你喜爱的
-          <span class="bg-clip-text text-transparent gradient-bg">哈基米音乐</span>
-        </h1>
-        <p class="text-xl text-slate-300 mb-8">
-          一个由社区为爱发电驱动的开源音乐平台<br>
-        </p>
-
-        <div class="flex flex-wrap gap-4" style="z-index: 999">
-          <a href="#download"
-             class="bg-primary hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors flex items-center">
-            <i class="fas fa-download mr-2"></i> 立即下载
-          </a>
-          <a href="#features"
-             class="border border-slate-700 hover:border-primary px-6 py-3 rounded-lg font-medium transition-colors">
-            了解更多
-          </a>
-          <a href="/app/"
-             class="bg-secondary hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors flex items-center"
-             id="web-app"
-          >
-            进入 Web 端（实验性）
-          </a>
-        </div>
+      <div class="nav-links" role="navigation">
+        <a href="#features">特色</a>
+        <a href="#download">下载</a>
+        <a href="#community">社区</a>
+        <a href="#about">关于</a>
+      </div>
+      <div class="nav-actions">
+        <a href="https://github.com/HachimiWorld" class="chip" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
       </div>
     </div>
-    <img class="mt-8 shadow-xl" src="static/screenshot-light.webp" alt="screenshot"/>
-  </div>
-</section>
+  </nav>
 
-<!-- 价值主张 -->
-<section id="features" class="py-20 px-6 bg-slate-800">
-  <div class="container mx-auto max-w-6xl">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold mb-4">为什么选择基米天堂</h2>
-      <p class="text-xl text-slate-300 max-w-2xl mx-auto">我们为哈基米音乐创作者和爱好者打造了一个独特的开源音乐平台</p>
-    </div>
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-card">
+          <div class="kicker"><i class="fas fa-bolt"></i> 社区驱动 · 开源 · 为爱发电</div>
+          <h1>发现和分享你喜爱的 <span class="highlight">哈基米音乐</span></h1>
+          <p>一个由社区为爱发电驱动的开源音乐平台</p>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
-        <div class="w-14 h-14 rounded-full gradient-bg flex items-center justify-center mb-6">
-          <i class="fas fa-compass text-2xl text-white"></i>
-        </div>
-        <h3 class="text-xl font-semibold mb-3">探索艺术</h3>
-        <p class="text-slate-300">在我们专为哈基米音乐定制的社区里探索你喜爱的作品</p>
-      </div>
-
-      <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
-        <div class="w-14 h-14 rounded-full gradient-bg flex items-center justify-center mb-6">
-          <i class="fas fa-microphone-alt text-2xl text-white"></i>
-        </div>
-        <h3 class="text-xl font-semibold mb-3">成为神人</h3>
-        <p class="text-slate-300">分享你的哈基米作品，与志同道合的音乐人合作，成为哈基米文化的引领者</p>
-      </div>
-
-      <div class="bg-slate-700/30 rounded-2xl p-6 card-hover">
-        <div class="w-14 h-14 rounded-full gradient-bg flex items-center justify-center mb-6">
-          <i class="fas fa-heart text-2xl text-white"></i>
-        </div>
-        <h3 class="text-xl font-semibold mb-3">社区驱动</h3>
-        <p class="text-slate-300">完全由爱好者开发维护的开源平台，所有功能都围绕实际需求设计，不包含任何商业内容</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 下载区域 -->
-<section id="download" class="py-20 px-6 hero-pattern">
-  <div class="container mx-auto max-w-6xl">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold mb-4">下载最新的基米天堂客户端</h2>
-      <p class="text-xl text-slate-300 max-w-2xl mx-auto">基米天堂客户端通过 GitHub Actions 进行全自动构建</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
-      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-          <i class="fab fa-windows text-3xl text-white"></i>
-        </div>
-        <h3 class="text-lg font-semibold mb-2">Windows</h3>
-        <p class="text-slate-300 text-sm mb-2">Windows 10 及以上版本</p>
-        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-windows" class="text-xs">...</span>
-        </p>
-        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-windows" class="text-xs">...</span></p>
-        <a id="download-windows" target="_blank">
-          <button
-            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
-            <i class="fas fa-download mr-2"></i> 下载
-          </button>
-        </a>
-      </div>
-
-      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-          <i class="fab fa-apple text-3xl text-white"></i>
-        </div>
-        <h3 class="text-lg font-semibold mb-2">Mac OS</h3>
-        <p class="text-slate-300 text-sm mb-2">Apple Silicon</p>
-        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-macos" class="text-xs">...</span></p>
-        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-macos" class="text-xs">...</span></p>
-        <a id="download-macos" target="_blank">
-          <button
-            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
-            <i class="fas fa-download mr-2"></i> 下载
-          </button>
-        </a>
-      </div>
-
-      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-          <i class="fab fa-linux text-3xl text-white"></i>
-        </div>
-        <h3 class="text-lg font-semibold mb-2">Linux</h3>
-        <p class="text-slate-300 text-sm mb-2">DEB 包可用</p>
-        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-linux" class="text-xs">...</span></p>
-        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-linux" class="text-xs">...</span></p>
-        <a id="download-linux" target="_blank">
-          <button
-            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
-            <i class="fas fa-download mr-2"></i> 下载
-          </button>
-        </a>
-      </div>
-
-      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-          <i class="fab fa-android text-3xl text-white"></i>
-        </div>
-        <h3 class="text-lg font-semibold mb-2">Android</h3>
-        <p class="text-slate-300 text-sm mb-2">Android 9.0 及以上版本</p>
-        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-android" class="text-xs">...</span>
-        </p>
-        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-android" class="text-xs">...</span></p>
-        <a id="download-android" target="_blank">
-          <button
-            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
-            <i class="fas fa-download mr-2"></i> 下载
-          </button>
-        </a>
-      </div>
-
-      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-          <i class="fab fa-apple text-3xl text-white"></i>
-        </div>
-        <h3 class="text-lg font-semibold mb-2">iOS</h3>
-        <p class="text-slate-300 text-sm mb-2">IPA 包自行签名安装</p>
-        <p class="text-slate-300 text-sm mb-0">发布时间<br><span id="release-time-ios" class="text-xs">...</span></p>
-        <p class="text-slate-300 text-sm mb-4">版本<br><span id="version-ios" class="text-xs">...</span></p>
-        <a id="download-ios" target="_blank">
-          <button
-            class="bg-slate-700 hover:bg-slate-600 w-full py-2 rounded-lg transition-colors flex items-center justify-center">
-            <i class="fas fa-download mr-2"></i> 下载
-          </button>
-        </a>
-      </div>
-
-      <div class="bg-slate-800 rounded-xl p-6 text-center card-hover">
-        <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
-          <i class="fab text-3xl text-white"></i>
-        </div>
-        <h3 class="text-lg font-semibold mb-2">HarmonyOS</h3>
-        <p class="text-slate-300 text-sm mb-2">敬请期待</p>
-      </div>
-
-    </div>
-
-    <!--<div class="text-center mt-12 text-slate-400">
-        <p>需要其他平台？查看我们的 <a href="#" class="text-primary hover:underline">其他下载选项</a></p>
-    </div>-->
-  </div>
-</section>
-
-<!-- 社区证明 -->
-<section id="community" class="py-20 px-6 bg-slate-800">
-  <div class="container mx-auto max-w-6xl">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold mb-4">社区的声音</h2>
-      <p class="text-xl text-slate-300 max-w-2xl mx-auto">看看我们的用户如何评价基米天堂</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-slate-700/30 rounded-2xl p-6">
-        <div class="flex mb-4">
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-        </div>
-        <p class="text-slate-300 mb-6">
-          "基米天堂彻底改变了我分享音乐的方式。开源模式让社区能够真正塑造平台的发展方向。"</p>
-        <div class="flex items-center">
-          <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mr-3">
-            <i class="fas fa-user text-white"></i>
+          <div class="actions">
+            <a href="#download" class="btn btn-primary"><i class="fas fa-download"></i> 立即下载</a>
+            <a href="#features" class="btn"><i class="fas fa-circle-info"></i> 了解更多</a>
+            <a href="#download" class="btn"><i class="fas fa-globe"></i> 进入 Web 端（实验性）</a>
           </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="v">AGPLv3</div>
+              <div class="k">完全开源</div>
+            </div>
+            <div class="stat">
+              <div class="v">多平台</div>
+              <div class="k">Win / macOS / Linux / Android / iOS</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-media">
+          <img src="static/screenshot-light.webp" alt="基米天堂 客户端截图">
+        </div>
+      </div>
+    </section>
+
+
+    <!-- FEATURES -->
+    <section id="features" class="section alt">
+      <div class="wrap">
+        <div class="section-head">
           <div>
-            <div class="font-medium">随便编的</div>
-            <div class="text-sm text-slate-400">电子音乐制作人</div>
+            <h2>为什么选择基米天堂</h2>
+            <p>我们为哈基米音乐创作者和爱好者打造了一个独特的开源音乐平台</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="feature">
+            <div class="icon"><i class="fas fa-compass"></i></div>
+            <h3>探索艺术</h3>
+            <p>在我们专为哈基米音乐定制的社区里探索你喜爱的作品</p>
+          </div>
+          <div class="feature">
+            <div class="icon"><i class="fas fa-microphone-alt"></i></div>
+            <h3>成为神人</h3>
+            <p>分享你的哈基米作品，与志同道合的音乐人合作，成为哈基米文化的引领者</p>
+          </div>
+          <div class="feature">
+            <div class="icon"><i class="fas fa-heart"></i></div>
+            <h3>社区驱动</h3>
+            <p>完全由爱好者开发维护的开源平台，所有功能都围绕实际需求设计，不包含任何商业内容</p>
           </div>
         </div>
       </div>
+    </section>
 
-      <div class="bg-slate-700/30 rounded-2xl p-6">
-        <div class="flex mb-4">
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-        </div>
-        <p class="text-slate-300 mb-6">
-          "作为一名独立音乐人，基米天堂给了我展示作品的平台，并让我结识了许多有才华的合作者。"</p>
-        <div class="flex items-center">
-          <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mr-3">
-            <i class="fas fa-user text-white"></i>
-          </div>
+    <!-- DOWNLOAD -->
+    <section id="download" class="section">
+      <div class="wrap">
+        <div class="section-head">
           <div>
-            <div class="font-medium">随便编的</div>
-            <div class="text-sm text-slate-400">独立歌手</div>
+            <h2>下载最新的基米天堂客户端</h2>
+            <p>基米天堂客户端通过 GitHub Actions 进行全自动构建</p>
+          </div>
+        </div>
+
+        <div class="download-grid">
+          <div class="dl">
+            <div class="dl-head">
+              <div class="platform"><i class="fab fa-windows"></i> Windows</div>
+              <div class="badge">稳定版</div>
+            </div>
+            <div class="dl-meta">系统：<span>Windows 10+</span></div>
+            <div class="dl-meta">发布时间：<span id="release-time-windows">...</span></div>
+            <div class="dl-meta">版本：<span id="version-windows">...</span></div>
+            <a id="download-windows" class="dl-btn" target="_blank" href="#"><button class="btn btn-wide"><i class="fas fa-download"></i> 下载</button></a>
+          </div>
+
+          <div class="dl">
+            <div class="dl-head">
+              <div class="platform"><i class="fab fa-apple"></i> macOS</div>
+              <div class="badge">Apple Silicon</div>
+            </div>
+            <div class="dl-meta">芯片：<span>M 系列</span></div>
+            <div class="dl-meta">发布时间：<span id="release-time-macos">...</span></div>
+            <div class="dl-meta">版本：<span id="version-macos">...</span></div>
+            <a id="download-macos" class="dl-btn" target="_blank" href="#"><button class="btn btn-wide"><i class="fas fa-download"></i> 下载</button></a>
+          </div>
+
+          <div class="dl">
+            <div class="dl-head">
+              <div class="platform"><i class="fab fa-linux"></i> Linux</div>
+              <div class="badge">DEB</div>
+            </div>
+            <div class="dl-meta">发行版：<span>Ubuntu / Debian</span></div>
+            <div class="dl-meta">发布时间：<span id="release-time-linux">...</span></div>
+            <div class="dl-meta">版本：<span id="version-linux">...</span></div>
+            <a id="download-linux" class="dl-btn" target="_blank" href="#"><button class="btn btn-wide"><i class="fas fa-download"></i> 下载</button></a>
+          </div>
+
+          <div class="dl">
+            <div class="dl-head">
+              <div class="platform"><i class="fab fa-android"></i> Android</div>
+              <div class="badge">APK</div>
+            </div>
+            <div class="dl-meta">系统：<span>Android 9+</span></div>
+            <div class="dl-meta">发布时间：<span id="release-time-android">...</span></div>
+            <div class="dl-meta">版本：<span id="version-android">...</span></div>
+            <a id="download-android" class="dl-btn" target="_blank" href="#"><button class="btn btn-wide"><i class="fas fa-download"></i> 下载</button></a>
+          </div>
+
+          <div class="dl">
+            <div class="dl-head">
+              <div class="platform"><i class="fab fa-apple"></i> iOS</div>
+              <div class="badge">需自签</div>
+            </div>
+            <div class="dl-meta">格式：<span>IPA</span></div>
+            <div class="dl-meta">发布时间：<span id="release-time-ios">...</span></div>
+            <div class="dl-meta">版本：<span id="version-ios">...</span></div>
+            <a id="download-ios" class="dl-btn" target="_blank" href="#"><button class="btn btn-wide"><i class="fas fa-download"></i> 下载</button></a>
+          </div>
+
+          <div class="dl">
+            <div class="dl-head">
+              <div class="platform"><i class="fas fa-mobile-screen"></i> HarmonyOS</div>
+              <div class="badge">敬请期待</div>
+            </div>
+            <div class="dl-meta">计划：<span>后续支持</span></div>
+            <div class="dl-meta">状态：<span>开发中</span></div>
+            <div class="dl-meta">版本：<span>—</span></div>
+            <a class="dl-btn" href="#"><button class="btn btn-wide" disabled style="opacity:.6; cursor:not-allowed;"><i class="fas fa-hourglass"></i> 暂不可用</button></a>
           </div>
         </div>
       </div>
+    </section>
 
-      <div class="bg-slate-700/30 rounded-2xl p-6">
-        <div class="flex mb-4">
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-          <i class="fas fa-star text-yellow-400"></i>
-        </div>
-        <p class="text-slate-300 mb-6">"开源社区的力量真是太棒了！我可以直接参与开发，为平台添加我需要的功能。"</p>
-        <div class="flex items-center">
-          <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center mr-3">
-            <i class="fas fa-user text-white"></i>
-          </div>
+    <!-- COMMUNITY -->
+    <section id="community" class="section alt">
+      <div class="wrap">
+        <div class="section-head">
           <div>
-            <div class="font-medium">随便编的</div>
-            <div class="text-sm text-slate-400">开发者和音乐爱好者</div>
+            <h2>社区的声音</h2>
+            <p>看看我们的用户如何评价基米天堂</p>
+          </div>
+        </div>
+
+        <div class="quotes">
+          <div class="quote">
+            <div class="stars">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+            <p>“开源模式让社区能真正塑造平台的发展方向，体验比我预期更完整。”</p>
+            <div class="who">
+              <div class="avatar"><i class="fas fa-user"></i></div>
+              <div>
+                <div class="name">随便编的</div>
+                <div class="role">电子音乐制作人</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="quote">
+            <div class="stars">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+            <p>“作为独立音乐人，我终于有个更愿意听我说话的地方。”</p>
+            <div class="who">
+              <div class="avatar"><i class="fas fa-user"></i></div>
+              <div>
+                <div class="name">随便编的</div>
+                <div class="role">独立歌手</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="quote">
+            <div class="stars">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+            <p>“我能直接提 PR，把我想要的功能写进去，这才是社区。”</p>
+            <div class="who">
+              <div class="avatar"><i class="fas fa-user"></i></div>
+              <div>
+                <div class="name">随便编的</div>
+                <div class="role">开发者 & 爱好者</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- CTA区域 -->
-<section class="py-20 px-6 gradient-bg">
-  <div class="container mx-auto max-w-4xl text-center">
-    <h2 class="text-3xl md:text-4xl font-bold mb-6">加入基米天堂社区</h2>
-    <p class="text-xl opacity-90 mb-10">发现和分享哈基米音乐，连接全世界的创作者和爱好者</p>
-    <div class="flex flex-col sm:flex-row justify-center gap-4">
-      <a href="#download"
-         class="bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center">
-        <i class="fas fa-download mr-2"></i> 立即下载
-      </a>
-      <a href="https://github.com/HachimiWorld" target="_blank"
-         class="bg-slate-900 text-white hover:bg-slate-800 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center">
-        <i class="fab fa-github mr-2"></i> GitHub贡献
-      </a>
-    </div>
-  </div>
-</section>
+    <!-- ABOUT (merged section) -->
+    <section id="about" class="section">
+      <div class="wrap">
+        <div class="about-block">
 
-<!-- 页脚 -->
-<footer class="py-12 px-6 bg-slate-900">
-  <div class="container mx-auto max-w-6xl">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-      <div>
-        <div class="flex items-center mb-6">
-          <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center mr-3">
-            <i class="fas fa-music text-white"></i>
+          <div class="resource-groups" aria-label="项目入口">
+            <div>
+              <div class="pill-row">
+                <a class="pill pill-primary" href="https://github.com/HachimiWorld" target="_blank" rel="noopener">
+                  <span><i class="fab fa-github"></i> 组织主页</span>
+                </a>
+                <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client" target="_blank" rel="noopener">
+                  <span><i class="fas fa-code"></i> 仓库页</span>
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <div class="pill-row">
+                <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client/issues/new/choose" target="_blank" rel="noopener">
+                  <span><i class="fas fa-bug"></i> 反馈 BUG</span>
+                </a>
+                <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client/discussions" target="_blank" rel="noopener">
+                  <span><i class="fas fa-comments"></i> 讨论</span>
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <div class="pill-row">
+                <a class="pill" href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener">
+                  <span><i class="fab fa-discord"></i> Discord</span>
+                </a>
+              </div>
+            </div>
           </div>
-          <span class="text-xl font-bold">基米天堂</span>
         </div>
-        <p class="text-slate-400">发现和分享哈基米音乐的开源平台，由社区为爱发电驱动</p>
       </div>
+    </section>
 
-      <div>
-        <h3 class="text-lg font-semibold mb-6">下载</h3>
-        <ul class="space-y-3">
-          <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Mac OS客户端</a></li>
-          <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Windows客户端</a></li>
-          <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Linux客户端</a></li>
-          <li><a href="#download" class="text-slate-400 hover:text-primary transition-colors">Android客户端</a></li>
-        </ul>
-      </div>
+    <!-- CTA (removed: merged into about) -->
+  </main>
 
-      <div>
-        <h3 class="text-lg font-semibold mb-6">资源</h3>
-        <ul class="space-y-3">
-<!--          <li><a target="_blank" href="https://github.com/HachimiWorld"
-                 class="text-slate-400 hover:text-primary transition-colors">文档</a></li>
-          <li><a target="_blank" href="https://github.com/HachimiWorld"
-                 class="text-slate-400 hover:text-primary transition-colors">API</a></li>
-          <li><a target="_blank" href="https://github.com/HachimiWorld"
-                 class="text-slate-400 hover:text-primary transition-colors">开发指南</a></li>-->
-          <li><a target="_blank" href="https://github.com/HachimiWorld"
-                 class="text-slate-400 hover:text-primary transition-colors">贡献指南</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h3 class="text-lg font-semibold mb-6">联系我们</h3>
-        <ul class="space-y-3">
-          <li><a href="https://github.com/HachimiWorld/hachimi-world-client/issues/new?template=bug-%E6%8A%A5%E5%91%8A.md" class="text-slate-400 hover:text-primary transition-colors">反馈建议</a></li>
-          <li><a href="https://github.com/HachimiWorld/hachimi-world-client/discussions" class="text-slate-400 hover:text-primary transition-colors">社区论坛</a></li>
-          <li><a href="#" class="text-slate-400 hover:text-primary transition-colors">社交媒体</a></li>
-          <li><a target="_blank" href="https://github.com/HachimiWorld"
-                 class="text-slate-400 hover:text-primary transition-colors">GitHub仓库</a></li>
-        </ul>
-      </div>
+  <!-- Footer: replaced with single-line copyright as requested -->
+  <footer>
+    <div class="wrap" style="padding:28px 0; text-align:center; color:var(--muted-2);">
+      <small>© 2026 基米天堂 · Open Source Project licensed under AGPLv3.</small>
     </div>
+  </footer>
 
-    <div class="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-      <div class="text-slate-500 text-sm mb-4 md:mb-0">© 2026 基米天堂. Open Source Project licenced under AGPLv3.</div>
-      <div class="flex space-x-4">
-        <!--                <a href="#" class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-twitter"></i></a>-->
-        <a href="https://discord.gg/KGBaW8SwBF" class="text-slate-500 hover:text-primary transition-colors"><i
-          class="fab fa-discord"></i></a>
-        <!--                <a href="#" class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-instagram"></i></a>-->
-        <a target="_blank" href="https://github.com/HachimiWorld"
-           class="text-slate-500 hover:text-primary transition-colors"><i class="fab fa-github"></i></a>
-      </div>
-    </div>
-  </div>
-</footer>
 </body>
 </html>
