@@ -1,13 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hachimi World (WIP) - An open-source community to discover and share Hachimi music</title>
 
+  <!-- Theme init BEFORE paint to prevent flash -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('theme');
+      if (!t) t = matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
   <!-- SEO -->
-  <meta name="description"
-        content="Hachimi World — a community-driven open-source music project focused on discovering and sharing Hachimi music, connecting creators and fans.">
+  <meta name="description" content="Hachimi World — a community-driven open-source music project focused on discovering and sharing Hachimi music, connecting creators and fans.">
   <meta name="keywords" content="Hachimi, Hachimi World, open source, music, community">
   <meta name="author" content="HachimiWorld">
   <link rel="canonical" href="https://hachimi.world/en/">
@@ -18,20 +26,16 @@
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="Hachimi World">
-  <meta property="og:title"
-        content="Hachimi World (WIP) - An open-source community to discover and share Hachimi music">
-  <meta property="og:description"
-        content="Hachimi World — a community-driven open-source music project focused on discovering and sharing Hachimi music, connecting creators and fans.">
+  <meta property="og:title" content="Hachimi World (WIP) - An open-source community to discover and share Hachimi music">
+  <meta property="og:description" content="Hachimi World — a community-driven open-source music project focused on discovering and sharing Hachimi music, connecting creators and fans.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://hachimi.world/en/">
   <meta property="og:image" content="https://hachimi.world/static/og-image.png">
   <meta property="og:locale" content="en_US">
 
-  <!-- Theme colors -->
-  <meta name="theme-color" content="#FF7022" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#2B2A25" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" id="theme-meta" content="#1a1918">
 
-  <!-- Structured data: WebSite + Organization -->
+  <!-- Structured data -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -45,10 +49,7 @@
             "@type": "Organization",
             "name": "HachimiWorld",
             "url": "https://hachimi.world/",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://hachimi.world/static/logo-dark.svg"
-            }
+            "logo": { "@type": "ImageObject", "url": "https://hachimi.world/static/logo-dark.svg" }
           }
         },
         {
@@ -62,12 +63,14 @@
   </script>
 
   <link rel="icon" href="/favicon.ico">
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      fetchVersion(['windows', 'macos', 'linux', 'android', 'ios']).catch(()=>{})
+      fetchVersion(['windows','macos','linux','android','ios']).catch(()=>{})
+      initReveal()
+      initCarousel()
+      initTheme()
     })
 
     async function fetchVersion(platforms) {
@@ -84,11 +87,9 @@
             const variant = "release-" + platform
             const versionData = data.data.find(v => v.variant === variant)
             if (!versionData) continue
-
             const versionEl = document.getElementById('version-' + platform)
             const downloadEl = document.getElementById('download-' + platform)
             const timeEl = document.getElementById('release-time-' + platform)
-
             if (versionEl) versionEl.textContent = versionData.version_name
             if (downloadEl) downloadEl.href = versionData.url
             if (timeEl) timeEl.textContent = new Date(versionData.release_time).toLocaleString('en-US', {
@@ -96,477 +97,864 @@
             })
           }
         }
-      } catch (e) {
-        console.warn('fetchVersion failed', e)
+      } catch (e) { console.warn('fetchVersion failed', e) }
+    }
+
+    function initReveal() {
+      const els = document.querySelectorAll('.reveal')
+      if (!els.length) return
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target) } })
+      }, { threshold: 0.08 })
+      els.forEach(el => io.observe(el))
+    }
+
+    function initCarousel() {
+      const dSlides = document.querySelectorAll('.carousel-desktop .c-slide')
+      const mSlides = document.querySelectorAll('.carousel-mobile .c-slide')
+      const dots = document.querySelectorAll('.c-dot')
+      const labelEl = document.getElementById('carousel-label')
+      const labels = ['Home · Light', 'Home · Dark', 'Player']
+      let cur = 0, total = dSlides.length
+      if (!total) return
+
+      function goTo(i) {
+        dSlides[cur].classList.remove('active')
+        mSlides[cur].classList.remove('active')
+        dots[cur].classList.remove('active')
+        cur = ((i % total) + total) % total
+        dSlides[cur].classList.add('active')
+        mSlides[cur].classList.add('active')
+        dots[cur].classList.add('active')
+        if (labelEl) labelEl.textContent = labels[cur]
       }
+
+      dots.forEach((d, i) => d.addEventListener('click', () => { goTo(i); reset() }))
+
+      let timer = setInterval(() => goTo(cur + 1), 3000)
+      function reset() { clearInterval(timer); timer = setInterval(() => goTo(cur + 1), 3000) }
+
+      const el = document.getElementById('carousel')
+      if (el) {
+        el.addEventListener('mouseenter', () => clearInterval(timer))
+        el.addEventListener('mouseleave', () => { timer = setInterval(() => goTo(cur + 1), 3000) })
+      }
+    }
+
+    function initTheme() {
+      const btn = document.getElementById('theme-toggle')
+      if (!btn) return
+      const meta = document.getElementById('theme-meta')
+      if (meta) meta.content = document.documentElement.getAttribute('data-theme') === 'light' ? '#f5f3f0' : '#1a1918'
+
+      btn.addEventListener('click', () => {
+        const html = document.documentElement
+        const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+        html.setAttribute('data-theme', next)
+        localStorage.setItem('theme', next)
+        if (meta) meta.content = next === 'light' ? '#f5f3f0' : '#1a1918'
+      })
     }
   </script>
 
-  <!--
-    NOTE:
-    - This page intentionally reuses the same inline CSS approach as /index.html.
-    - Keep class names / ids stable so shared JS (version fetch) keeps working.
-  -->
   <style>
     :root {
-      /* ===== Theme tokens (match captcha.html) ===== */
-      --light-primary-color: #FF7022;
-      --dark-primary-color: #FF782F;
-      --light-bg: #EBE9E7;
-      --light-text: #333;
-      --light-card-bg: rgba(255, 255, 255, 0.6);
-      --dark-bg: #2B2A25;
-      --dark-text: #FFF;
-      --dark-card-bg: rgba(255, 255, 255, 0.07);
-
-      /* ===== Derived / runtime variables (default to dark) ===== */
-      --primary: var(--dark-primary-color);
-      --primary-2: var(--dark-primary-color);
-      --bg: var(--dark-bg);
-      --text: var(--dark-text);
-      --surface: var(--dark-card-bg);
-
-      /* extra surfaces/borders for this page */
-      --surface-2: rgba(255,255,255,0.10);
-      --border: rgba(255,255,255,0.10);
-
-      --muted: rgba(255,255,255,0.72);
-      --muted-2: rgba(255,255,255,0.55);
-
-      --shadow: 0 2px 16px rgba(0,0,0,0.06);
-      --shadow-strong: 0 18px 40px rgba(0,0,0,0.45);
-
+      --accent: #FF782F;
+      --accent-2: #FF9A5C;
+      --bg: #131211;
+      --bg-2: #1a1918;
+      --text: #f0ede8;
+      --text-2: rgba(240, 237, 232, 0.72);
+      --text-3: rgba(240, 237, 232, 0.46);
+      --surface: rgba(255, 255, 255, 0.05);
+      --surface-2: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-2: rgba(255, 255, 255, 0.04);
+      --shadow: 0 4px 32px rgba(0, 0, 0, 0.25);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
       --radius: 16px;
+      --radius-lg: 24px;
+      --container: 1140px;
+      --container-pad: clamp(16px, 3vw, 24px);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
 
-    @media (prefers-color-scheme: light) {
-      :root {
-        --primary: var(--light-primary-color);
-        --primary-2: var(--light-primary-color);
-        --bg: var(--light-bg);
-        --text: var(--light-text);
-        --surface: var(--light-card-bg);
-
-        --surface-2: rgba(255, 255, 255, 0.82);
-        --border: rgba(0,0,0,0.08);
-
-        --muted: rgba(51,51,51,0.75);
-        --muted-2: rgba(51,51,51,0.58);
-
-        --shadow: 0 10px 26px rgba(0,0,0,0.06);
-        --shadow-strong: 0 18px 44px rgba(0,0,0,0.10);
-      }
-
-      /* nav in light mode: use theme variables */
-      .nav {
-        background: color-mix(in srgb, var(--bg) 82%, transparent);
-        border-bottom: 1px solid var(--border);
-      }
-
-      .chip { color: var(--text); }
+    html[data-theme="light"] {
+      --accent: #FF7022;
+      --accent-2: #E85D10;
+      --bg: #f5f3f0;
+      --bg-2: #eae7e3;
+      --text: #1a1918;
+      --text-2: rgba(26, 25, 24, 0.68);
+      --text-3: rgba(26, 25, 24, 0.42);
+      --surface: rgba(255, 255, 255, 0.72);
+      --surface-2: rgba(255, 255, 255, 0.92);
+      --border: rgba(0, 0, 0, 0.07);
+      --border-2: rgba(0, 0, 0, 0.04);
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.1);
     }
 
-    /* Logo is handled by <picture> sources */
+    html[data-theme="dark"] .logo-light,
+    html[data-theme="light"] .logo-dark { display: none !important; }
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
+    html[data-theme="dark"] .icon-moon,
+    html[data-theme="light"] .icon-sun { display: none !important; }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      font-family: var(--font);
       color: var(--text);
       background: var(--bg);
-      overflow-x: hidden;
+      overflow-x: clip;
+      -webkit-font-smoothing: antialiased;
     }
 
     a { color: inherit; text-decoration: none; }
-    .wrap { width: min(1120px, 92vw); margin: 0 auto; }
+    img { display: block; max-width: 100%; }
+    button { font: inherit; }
 
-    /* NAV */
+    .wrap {
+      width: 100%;
+      max-width: var(--container);
+      margin: 0 auto;
+      padding-inline: var(--container-pad);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .7s cubic-bezier(.22, 1, .36, 1), transform .7s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .reveal-d1 { transition-delay: .08s; }
+    .reveal-d2 { transition-delay: .16s; }
+    .reveal-d3 { transition-delay: .24s; }
+
     .nav {
       position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 50;
-      background: color-mix(in srgb, var(--bg) 82%, transparent);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-inner { display:flex; align-items:center; justify-content:space-between; padding: 14px 0; gap: 12px; }
-    .brand { display:flex; align-items:center; gap: 12px; }
-    .brand img { height: 42px; display:block; }
-    .nav-links { display:none; gap: 20px; align-items:center; }
-    .nav-links a { color: var(--muted); font-weight: 600; font-size: 14px; letter-spacing: .2px; }
-    .nav-links a:hover { color: var(--primary); }
-
-    .nav-actions { display:flex; align-items:center; gap: 10px; }
-    .chip {
-      display:inline-flex; align-items:center; gap:10px;
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      border-radius: 12px;
-      color: var(--text);
-      box-shadow: var(--shadow);
+      inset: 0 0 auto;
+      z-index: 100;
+      background: color-mix(in srgb, var(--bg) 80%, transparent);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border-bottom: 1px solid var(--border-2);
     }
 
-    /* HERO */
-    .hero {
-      padding: 96px 0 28px;
-    }
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 22px;
+    .nav-inner {
+      display: flex;
       align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-width: 0;
+      padding-block: 12px;
     }
 
-    .hero-card {
-      background: var(--surface);
+    .brand {
+      display: flex;
+      align-items: center;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .brand img {
+      width: auto;
+      height: 34px;
+      max-width: min(180px, 100%);
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 24px;
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+
+    .nav-links a {
+      color: var(--text-2);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color .2s;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 38px;
+      padding: 7px 12px;
       border: 1px solid var(--border);
-      border-radius: calc(var(--radius) + 4px);
-      padding: 22px;
-      box-shadow: var(--shadow);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text-2);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .chip:hover {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    .hide-mobile { display: inline; }
+
+    .hero {
+      position: relative;
+      padding-top: 110px;
+      text-align: center;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: min(700px, 90vw);
+      height: min(420px, 52vw);
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
     }
 
     .kicker {
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      padding: 8px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      margin-bottom: 18px;
       border-radius: 999px;
-      border: 1px solid var(--border);
-      background: color-mix(in srgb, var(--primary) 16%, transparent);
-      color: var(--text);
+      border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      color: var(--accent);
+      font-size: 12px;
       font-weight: 600;
-      font-size: 13px;
     }
 
-    .hero h1 { margin: 14px 0 12px; font-size: 44px; line-height: 1.05; letter-spacing: -0.6px; }
-    .highlight { background: linear-gradient(90deg, var(--primary), var(--primary-2)); -webkit-background-clip:text; color: transparent; }
-    .hero p { margin: 0 0 18px; color: var(--muted); font-size: 16px; line-height: 1.6; }
+    .hero h1 {
+      margin: 0 0 14px;
+      font-size: clamp(28px, 5.5vw, 54px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
 
-    .actions { display:flex; gap: 12px; flex-wrap: wrap; }
+    .grad {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-sub {
+      max-width: 480px;
+      margin: 0 auto 24px;
+      color: var(--text-2);
+      font-size: clamp(14px, 2.2vw, 17px);
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
     .btn {
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 11px 20px;
       border: 1px solid var(--border);
+      border-radius: 12px;
       background: var(--surface);
       color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
       cursor: pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      transition: all .2s;
+      white-space: nowrap;
     }
+
     .btn:hover {
       transform: translateY(-1px);
-      border-color: color-mix(in srgb, var(--border) 60%, var(--text) 12%);
       background: var(--surface-2);
     }
 
-    .btn-primary {
-      background: var(--primary);
+    .btn-accent {
+      border-color: transparent;
+      background: var(--accent);
       color: #fff;
+      box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 35%, transparent);
     }
 
-    .stats {
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
+    .btn-accent:hover {
+      background: color-mix(in srgb, var(--accent) 88%, #fff);
     }
-    .stat {
-      padding: 12px;
-      border-radius: 14px;
-      background: var(--surface);
+
+    .hero-carousel {
+      position: relative;
+      width: 100%;
+      max-width: 920px;
+      margin: 48px auto 0;
+      padding-bottom: 28px;
+    }
+
+    .carousel-desktop {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      overflow: hidden;
       border: 1px solid var(--border);
-      box-shadow: var(--shadow);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: var(--shadow-lg);
     }
-    .stat .v { font-weight: 800; font-size: 16px; margin-bottom: 4px; }
-    .stat .k { color: var(--muted-2); font-size: 12px; }
 
-    .hero-media {
-      /* allow the image's own rounded corners to show */
-      border-radius: 0;
-      overflow: visible; /* image handles its own rounding */
-      border: none;
-      background: transparent;
-      box-shadow: var(--shadow-strong);
+    .carousel-desktop .c-slide,
+    .carousel-mobile .c-slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity .8s ease;
     }
-    .hero-media img { width: 100%; display:block; }
 
-    /* BAND */
-    .band {
-      padding: 22px 0;
+    .carousel-desktop .c-slide.active,
+    .carousel-mobile .c-slide.active {
+      opacity: 1;
     }
-    .band-inner {
-      display:flex;
+
+    .carousel-mobile {
+      position: absolute;
+      right: 4%;
+      bottom: -16px;
+      width: min(170px, 18%);
+      aspect-ratio: 1200 / 2670;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: var(--shadow-lg);
+      z-index: 5;
+    }
+
+    .carousel-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 14px;
-      align-items: stretch;
+      margin-top: 32px;
       flex-wrap: wrap;
     }
-    .band-item {
-      flex: 1 1 260px;
-      padding: 14px 16px;
-      border-radius: 14px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      display:flex;
-      gap: 12px;
+
+    .carousel-dots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .band-icon {
-      width: 42px; height: 42px;
-      border-radius: 12px;
-      display:flex; align-items:center; justify-content:center;
-      background: color-mix(in srgb, var(--primary) 16%, transparent);
-      border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
-      color: #fff;
+
+    .c-dot {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      background: var(--text-3);
+      cursor: pointer;
+      transition: all .3s;
       flex: 0 0 auto;
     }
-    .band-item h3 { margin: 2px 0 4px; font-size: 14px; }
-    .band-item p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
 
-    /* SECTION */
-    .section { padding: 54px 0; }
-    .section.alt {
-      background: color-mix(in srgb, var(--surface) 55%, transparent);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+    .c-dot.active {
+      width: 28px;
+      border-radius: 4px;
+      background: var(--accent);
     }
-    .section-head { display:flex; align-items:flex-end; justify-content:space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
-    .section-head h2 { margin: 0; font-size: 22px; letter-spacing: -0.2px; }
-    .section-head p { margin: 0; color: var(--muted); max-width: 60ch; }
 
-    /* FEATURES */
-    .grid-3 { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-    .feature {
-      padding: 16px;
-      border-radius: var(--radius);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
+    .carousel-label {
+      color: var(--text-3);
+      font-size: 13px;
+      font-weight: 600;
     }
-    .feature .icon {
-      width: 52px; height: 52px;
-      border-radius: 14px;
-      display:flex; align-items:center; justify-content:center;
-      background: linear-gradient(90deg, var(--primary), var(--primary-2));
-      color: #fff;
+
+    .hero-carousel::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 28px;
+      height: 80px;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      background: linear-gradient(to top, var(--bg), transparent);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .stats-strip {
+      padding-top: 40px;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 32px;
+    }
+
+    .stat-item {
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .stat-item .val {
+      margin-bottom: 3px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .stat-item .label {
+      color: var(--text-3);
+      font-size: 12px;
+    }
+
+    .section {
+      padding: 64px 0;
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 10px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
     }
-    .feature h3 { margin: 0 0 8px; font-size: 16px; }
-    .feature p { margin: 0; color: var(--muted); line-height: 1.6; }
 
-    /* DOWNLOAD */
-    .download-grid { display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-    .dl {
-      padding: 16px;
-      border-radius: var(--radius);
-      background: var(--surface);
+    .section-title {
+      margin: 0 0 8px;
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .section-desc {
+      max-width: 52ch;
+      margin: 0 auto 32px;
+      color: var(--text-2);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .section-center { text-align: center; }
+
+    .divider {
+      margin: 0;
+      border: none;
+      border-top: 1px solid var(--border-2);
+    }
+
+    .features-grid,
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .feat,
+    .quote-card,
+    .dl,
+    .links-block {
       border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: none;
+    }
+
+    .feat {
+      padding: 22px;
+      border-radius: var(--radius);
+      transition: transform .3s, box-shadow .3s;
+    }
+
+    .feat:hover,
+    .dl:hover {
+      transform: translateY(-2px);
       box-shadow: var(--shadow);
-      text-align: left;
-      display:flex;
+    }
+
+    .feat-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      margin-bottom: 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-size: 17px;
+    }
+
+    .feat h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .feat p {
+      margin: 0;
+      color: var(--text-2);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+    }
+
+    .dl {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 18px;
+      border-radius: var(--radius);
+      transition: transform .25s, box-shadow .25s;
+    }
+
+    .dl-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .dl-head .platform {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .dl-head .badge {
+      padding: 3px 10px;
+      border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 14%, transparent);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .dl-meta {
+      color: var(--text-3);
+      font-size: 12px;
+    }
+
+    .dl-meta span { color: var(--text-2); }
+    .dl .dl-btn { margin-top: auto; }
+    .btn-block { width: 100%; }
+
+    .quote-card {
+      display: flex;
+      flex-direction: column;
+      padding: 22px;
+      border-radius: var(--radius);
+    }
+
+    .quote-stars {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 12px;
+      color: #f59e0b;
+      font-size: 12px;
+    }
+
+    .quote-text {
+      flex: 1;
+      margin: 0 0 14px;
+      color: var(--text-2);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .quote-who {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .quote-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-2);
+      color: var(--text-3);
+      font-size: 13px;
+      flex: 0 0 auto;
+    }
+
+    .quote-name {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .quote-role {
+      color: var(--text-3);
+      font-size: 11px;
+    }
+
+    .links-block {
+      display: inline-block;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+    }
+
+    .pill-rows {
+      display: flex;
       flex-direction: column;
       gap: 10px;
-      min-height: 190px;
     }
-    .dl-head { display:flex; align-items:center; justify-content:space-between; gap: 10px; }
-    .dl-head .platform { font-weight: 800; }
-    .dl-head .badge {
-      background: color-mix(in srgb, var(--primary) 16%, transparent);
-      border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent);
-      color: var(--text);
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      white-space: nowrap;
+
+    .pill-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
-    .dl-meta { color: var(--muted-2); font-size: 12px; line-height: 1.5; }
-    .dl-meta span { color: var(--muted); }
-    .dl .dl-btn { margin-top: auto; }
-    .btn-wide { width: 100%; }
 
-    /* QUOTE */
-    .quotes { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-    .quote {
-      padding: 16px;
-      border-radius: var(--radius);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-    }
-    .stars { display:flex; gap: 6px; margin-bottom: 10px; color: #fbbf24; }
-    .quote p { margin: 0 0 12px; color: var(--muted); line-height: 1.6; }
-    .who { display:flex; align-items:center; gap: 10px; }
-    .who .avatar { width: 40px; height: 40px; border-radius: 12px; display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
-    .who .name { font-weight: 800; }
-    .who .role { font-size: 12px; color: var(--muted-2); }
-
-    /* ABOUT / RESOURCES (single-column, no cards) */
-    .about-block {
-      padding: 20px;
-      border-radius: calc(var(--radius) + 4px);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-    }
-    .about-block h2 { margin: 0 0 10px; font-size: 22px; letter-spacing: -0.2px; }
-    .about-block p { margin: 0; color: var(--muted); line-height: 1.7; max-width: 72ch; }
-
-    /* RESOURCE GROUPS */
-    .resource-groups { margin-top: 16px; display: grid; gap: 12px; }
-
-    .group-title {
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      color: rgba(255,255,255,0.88);
-      font-weight: 900;
-      letter-spacing: .2px;
-      margin-bottom: 10px;
-    }
-    .group-title i { color: rgba(255,112,34,0.95); }
-
-    .pill-row { display:flex; flex-wrap: wrap; gap: 10px; }
     .pill {
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 9px 14px;
       border: 1px solid var(--border);
+      border-radius: 999px;
       background: var(--surface);
-      color: var(--text);
-      box-shadow: var(--shadow);
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      color: var(--text-2);
+      font-size: 13px;
+      font-weight: 600;
       white-space: nowrap;
+      transition: all .2s;
     }
-    .pill:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--border) 60%, var(--text) 12%); background: var(--surface-2); }
 
-    .pill-primary {
-      border: 1px solid color-mix(in srgb, var(--primary) 38%, transparent);
-      background: color-mix(in srgb, var(--primary) 18%, transparent);
+    .pill:hover {
+      transform: translateY(-1px);
+      background: var(--surface-2);
       color: var(--text);
     }
-    .pill-primary:hover {
-      border-color: color-mix(in srgb, var(--primary) 55%, transparent);
-      background: color-mix(in srgb, var(--primary) 24%, transparent);
+
+    .pill-accent {
+      border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      color: var(--accent);
     }
 
-    /* Mobile pills layout (scoped to pills only) */
-    @media (max-width: 768px) {
-      .pill { width: 100%; justify-content: space-between; }
-      .pill-row { gap: 8px; }
+    .pill-accent:hover {
+      background: color-mix(in srgb, var(--accent) 20%, transparent);
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
     }
 
-    /* RESPONSIVE (restore) */
-    @media (max-width: 980px) {
-      .hero-grid { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 38px; }
-      .download-grid { grid-template-columns: 1fr; }
-      .grid-3 { grid-template-columns: 1fr; }
-      .quotes { grid-template-columns: 1fr; }
-      .stats { grid-template-columns: 1fr; }
+    footer {
+      padding: 28px 0;
+      border-top: 1px solid var(--border-2);
+      text-align: center;
     }
 
-    @media (min-width: 860px) {
-      .nav-links { display:flex; }
+    footer small {
+      color: var(--text-3);
+      font-size: 12px;
     }
 
-    @media (max-width: 768px) {
-      .actions {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+    @media (min-width: 861px) {
+      .nav-links { display: flex; }
+    }
+
+    @media (max-width: 860px) {
+      .features-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .quotes-grid {
+        grid-template-columns: 1fr;
       }
     }
 
-    /* FOOTER (redesign) */
-    footer {
-      padding: 34px 0 44px;
-      color: var(--muted-2);
-      border-top: 1px solid var(--border);
-      background: color-mix(in srgb, var(--surface) 25%, transparent);
-    }
+    @media (max-width: 640px) {
+      .nav-inner {
+        gap: 8px;
+        padding-block: 10px;
+      }
 
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.9fr 0.9fr;
-      gap: 18px;
-      align-items: start;
-    }
-    .footer-brand {
-      display: grid;
-      gap: 10px;
-    }
-    .footer-logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 900;
-      letter-spacing: .2px;
-      color: rgba(255,255,255,0.92);
-    }
-    .footer-logo img { height: 26px; display:block; }
-    .footer-desc { margin: 0; color: var(--muted); line-height: 1.7; max-width: 60ch; }
+      .brand {
+        flex: 1 1 0;
+      }
 
-    .footer-col h3 {
-      margin: 0 0 10px;
-      font-size: 13px;
-      letter-spacing: .2px;
-      color: rgba(255,255,255,0.88);
-    }
+      .brand img {
+        height: 28px;
+        width: auto;
+        max-width: min(124px, 32vw);
+      }
 
-    .footer-links {
-      display: grid;
-      gap: 8px;
-    }
-    .footer-links a {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--muted);
-      padding: 6px 0;
-    }
-    .footer-links a:hover { color: var(--primary); }
+      .nav-actions {
+        gap: 4px;
+      }
 
-    .footer-bottom {
-      margin-top: 18px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255,255,255,0.04);
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .footer-bottom small { color: var(--muted-2); }
-    .footer-mini {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    .footer-mini a { color: var(--muted-2); }
-    .footer-mini a:hover { color: var(--primary); }
+      .chip {
+        min-width: 36px;
+        min-height: 34px;
+        padding: 6px 8px;
+        font-size: 12px;
+        gap: 4px;
+      }
 
-    @media (max-width: 980px) {
-      .footer-grid { grid-template-columns: 1fr; }
+      .hide-mobile { display: none; }
+
+      .hero {
+        padding-top: 90px;
+      }
+
+      .hero h1 {
+        font-size: clamp(26px, 7vw, 36px);
+      }
+
+      .hero-sub {
+        font-size: 14px;
+      }
+
+      .kicker {
+        padding: 5px 12px;
+        font-size: 11px;
+      }
+
+      .actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .actions .btn {
+        width: 100%;
+      }
+
+      .hero-carousel {
+        max-width: 100%;
+        margin-top: 32px;
+        padding-bottom: 0;
+      }
+
+      .carousel-desktop {
+        display: none;
+      }
+
+      .carousel-mobile {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        width: min(320px, calc(100vw - (var(--container-pad) * 2) - 24px));
+        max-width: 100%;
+        margin: 0 auto;
+        border-radius: 18px;
+      }
+
+      .hero-carousel::after {
+        display: none;
+      }
+
+      .carousel-controls {
+        margin-top: 20px;
+      }
+
+      .stats-row {
+        align-items: center;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .section {
+        padding: 48px 0;
+      }
+
+      .features-grid,
+      .download-grid,
+      .quotes-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .links-block {
+        display: block;
+      }
+
+      .pill {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
+
 <nav class="nav">
   <div class="wrap nav-inner">
-    <div class="brand">
-      <picture>
-        <source srcset="/static/logo-light.svg" media="(prefers-color-scheme: light)">
-        <source srcset="/static/logo-dark.svg" media="(prefers-color-scheme: dark)">
-        <img src="/static/logo-dark.svg" alt="Hachimi World">
-      </picture>
-    </div>
+    <a href="/en/" class="brand">
+      <img class="logo-dark" src="/static/logo-dark.svg" alt="Hachimi World" height="34">
+      <img class="logo-light" src="/static/logo-light.svg" alt="Hachimi World" height="34">
+    </a>
     <div class="nav-links" role="navigation">
       <a href="#features">Features</a>
       <a href="#download">Download</a>
@@ -574,285 +962,190 @@
       <a href="#about">About</a>
     </div>
     <div class="nav-actions">
-      <a href="/" class="chip" title="Switch to Chinese">中文</a>
-      <a href="https://github.com/HachimiWorld" class="chip" target="_blank" rel="noopener"><i
-        class="fab fa-github"></i> GitHub</a>
+      <button id="theme-toggle" class="chip" title="Toggle light/dark" aria-label="Toggle theme">
+        <i class="fas fa-sun icon-sun"></i>
+        <i class="fas fa-moon icon-moon"></i>
+      </button>
+      <a href="/" class="chip" title="切换到中文">中文</a>
+      <a href="https://github.com/HachimiWorld" class="chip" target="_blank" rel="noopener"><i class="fab fa-github"></i><span class="hide-mobile"> GitHub</span></a>
     </div>
   </div>
 </nav>
 
 <main>
-  <!-- HERO -->
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-card">
-        <div class="kicker"><i class="fas fa-bolt"></i> Community-driven · Open Source · Built with
-          love
-        </div>
-        <h1>Discover and share your favorite <span class="highlight">Hachimi music</span></h1>
-        <p>An open-source music project made by the community.</p>
 
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-content reveal">
+        <div class="kicker"><i class="fas fa-bolt"></i> Community-driven · Open Source · Built with love</div>
+        <h1>Discover and share your favorite<br><span class="grad">Hachimi music</span></h1>
+        <p class="hero-sub">An open-source music platform made by the community, connecting creators and fans</p>
         <div class="actions">
-          <a href="#download" class="btn btn-primary"><i class="fas fa-download"></i> Download</a>
+          <a href="#download" class="btn btn-accent"><i class="fas fa-download"></i> Download</a>
           <a href="#features" class="btn"><i class="fas fa-circle-info"></i> Learn more</a>
           <a href="/app/" class="btn"><i class="fas fa-globe"></i> Web (Experimental)</a>
         </div>
-
-        <div class="stats">
-          <div class="stat">
-            <div class="v">AGPLv3</div>
-            <div class="k">Fully open-source</div>
-          </div>
-          <div class="stat">
-            <div class="v">Multi-platform</div>
-            <div class="k">Win / macOS / Linux / Android / iOS</div>
-          </div>
-        </div>
       </div>
 
-      <div class="hero-media">
-        <img src="/static/screenshot-light.webp" alt="Hachimi World client screenshot">
+      <div class="hero-carousel reveal reveal-d2" id="carousel">
+        <div class="carousel-desktop">
+          <img class="c-slide active" src="/static/screenshot-desktop-light.webp" alt="Desktop light mode" width="2400" height="1600">
+          <img class="c-slide" src="/static/screenshot-desktop-dark.webp" alt="Desktop dark mode" width="2400" height="1600">
+          <img class="c-slide" src="/static/screenshot-desktop-player.webp" alt="Desktop player" width="2400" height="1600">
+        </div>
+        <div class="carousel-mobile">
+          <img class="c-slide active" src="/static/screenshot-mobile-light.webp" alt="Mobile light mode" width="1200" height="2670">
+          <img class="c-slide" src="/static/screenshot-mobile-dark.webp" alt="Mobile dark mode" width="1200" height="2670">
+          <img class="c-slide" src="/static/screenshot-mobile-player.webp" alt="Mobile player" width="1200" height="2670">
+        </div>
+        <div class="carousel-controls">
+          <div class="carousel-dots">
+            <button class="c-dot active" data-idx="0" aria-label="Slide 1"></button>
+            <button class="c-dot" data-idx="1" aria-label="Slide 2"></button>
+            <button class="c-dot" data-idx="2" aria-label="Slide 3"></button>
+          </div>
+          <div class="carousel-label" id="carousel-label">Home · Light</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FEATURES -->
-  <section id="features" class="section alt">
+  <div class="stats-strip">
     <div class="wrap">
-      <div class="section-head">
-        <div>
-          <h2>Why Hachimi World</h2>
-          <p>Built for creators and fans of Hachimi music — open, community-driven, and focused on
-            real needs.</p>
-        </div>
+      <div class="stats-row reveal">
+        <div class="stat-item"><div class="val">AGPLv3</div><div class="label">Fully open-source</div></div>
+        <div class="stat-item"><div class="val">5 Platforms</div><div class="label">Win · macOS · Linux · Android · iOS</div></div>
+        <div class="stat-item"><div class="val">Community-driven</div><div class="label">Built with love · No commercial content</div></div>
       </div>
+    </div>
+  </div>
 
-      <div class="grid-3">
-        <div class="feature">
-          <div class="icon"><i class="fas fa-compass"></i></div>
-          <h3>Explore</h3>
-          <p>Discover Hachimi tracks and creators in a community tailored for this culture.</p>
-        </div>
-        <div class="feature">
-          <div class="icon"><i class="fas fa-microphone-alt"></i></div>
-          <h3>Create</h3>
-          <p>Share your work, collaborate, and help shape the culture with people who get it.</p>
-        </div>
-        <div class="feature">
-          <div class="icon"><i class="fas fa-heart"></i></div>
-          <h3>Community-first</h3>
-          <p>Fully open-source. No commercial content. Features are driven by real community
-            feedback.</p>
-        </div>
+  <hr class="divider" style="margin-top:40px;">
+
+  <section id="features" class="section">
+    <div class="wrap section-center">
+      <div class="section-label reveal"><i class="fas fa-sparkles"></i> Features</div>
+      <h2 class="section-title reveal">Why Hachimi World</h2>
+      <p class="section-desc reveal">Built for creators and fans of Hachimi music — open, community-driven, and focused on real needs</p>
+      <div class="features-grid">
+        <div class="feat reveal"><div class="feat-icon"><i class="fas fa-compass"></i></div><h3>Explore</h3><p>Discover Hachimi tracks and creators in a community tailored for this culture</p></div>
+        <div class="feat reveal reveal-d1"><div class="feat-icon"><i class="fas fa-microphone-alt"></i></div><h3>Create</h3><p>Share your work, collaborate, and help shape the culture with people who get it</p></div>
+        <div class="feat reveal reveal-d2"><div class="feat-icon"><i class="fas fa-heart"></i></div><h3>Community-first</h3><p>Fully open-source. No commercial content. Features are driven by real community feedback</p></div>
       </div>
     </div>
   </section>
 
-  <!-- DOWNLOAD -->
+  <hr class="divider">
+
   <section id="download" class="section">
     <div class="wrap">
-      <div class="section-head">
-        <div>
-          <h2>Download the latest Hachimi World client</h2>
-          <p>All builds are produced automatically via GitHub Actions.</p>
-        </div>
+      <div class="section-center">
+        <div class="section-label reveal"><i class="fas fa-arrow-down-to-line"></i> Download</div>
+        <h2 class="section-title reveal">Download the latest client</h2>
+        <p class="section-desc reveal">All builds are produced automatically via GitHub Actions</p>
       </div>
-
       <div class="download-grid">
-        <div class="dl">
-          <div class="dl-head">
-            <div class="platform"><i class="fab fa-windows"></i> Windows</div>
-            <div class="badge">Stable</div>
-          </div>
+        <div class="dl reveal">
+          <div class="dl-head"><div class="platform"><i class="fab fa-windows"></i> Windows</div><div class="badge">Stable</div></div>
           <div class="dl-meta">OS: <span>Windows 10+</span></div>
           <div class="dl-meta">Released: <span id="release-time-windows">...</span></div>
           <div class="dl-meta">Version: <span id="version-windows">...</span></div>
-          <a id="download-windows" class="dl-btn" target="_blank" href="#">
-            <button class="btn btn-wide"><i class="fas fa-download"></i> Download</button>
-          </a>
+          <a id="download-windows" class="dl-btn" target="_blank" href="#"><button class="btn btn-block"><i class="fas fa-download"></i> Download</button></a>
         </div>
-
-        <div class="dl">
-          <div class="dl-head">
-            <div class="platform"><i class="fab fa-apple"></i> macOS</div>
-            <div class="badge">Apple Silicon</div>
-          </div>
+        <div class="dl reveal reveal-d1">
+          <div class="dl-head"><div class="platform"><i class="fab fa-apple"></i> macOS</div><div class="badge">Apple Silicon</div></div>
           <div class="dl-meta">Chip: <span>M series</span></div>
           <div class="dl-meta">Released: <span id="release-time-macos">...</span></div>
           <div class="dl-meta">Version: <span id="version-macos">...</span></div>
-          <a id="download-macos" class="dl-btn" target="_blank" href="#">
-            <button class="btn btn-wide"><i class="fas fa-download"></i> Download</button>
-          </a>
+          <a id="download-macos" class="dl-btn" target="_blank" href="#"><button class="btn btn-block"><i class="fas fa-download"></i> Download</button></a>
         </div>
-
-        <div class="dl">
-          <div class="dl-head">
-            <div class="platform"><i class="fab fa-linux"></i> Linux</div>
-            <div class="badge">DEB</div>
-          </div>
+        <div class="dl reveal reveal-d2">
+          <div class="dl-head"><div class="platform"><i class="fab fa-linux"></i> Linux</div><div class="badge">DEB</div></div>
           <div class="dl-meta">Distros: <span>Ubuntu / Debian</span></div>
           <div class="dl-meta">Released: <span id="release-time-linux">...</span></div>
           <div class="dl-meta">Version: <span id="version-linux">...</span></div>
-          <a id="download-linux" class="dl-btn" target="_blank" href="#">
-            <button class="btn btn-wide"><i class="fas fa-download"></i> Download</button>
-          </a>
+          <a id="download-linux" class="dl-btn" target="_blank" href="#"><button class="btn btn-block"><i class="fas fa-download"></i> Download</button></a>
         </div>
-
-        <div class="dl">
-          <div class="dl-head">
-            <div class="platform"><i class="fab fa-android"></i> Android</div>
-            <div class="badge">APK</div>
-          </div>
+        <div class="dl reveal reveal-d3">
+          <div class="dl-head"><div class="platform"><i class="fab fa-android"></i> Android</div><div class="badge">APK</div></div>
           <div class="dl-meta">OS: <span>Android 9+</span></div>
           <div class="dl-meta">Released: <span id="release-time-android">...</span></div>
           <div class="dl-meta">Version: <span id="version-android">...</span></div>
-          <a id="download-android" class="dl-btn" target="_blank" href="#">
-            <button class="btn btn-wide"><i class="fas fa-download"></i> Download</button>
-          </a>
+          <a id="download-android" class="dl-btn" target="_blank" href="#"><button class="btn btn-block"><i class="fas fa-download"></i> Download</button></a>
         </div>
-
-        <div class="dl">
-          <div class="dl-head">
-            <div class="platform"><i class="fab fa-apple"></i> iOS</div>
-            <div class="badge">Sideload</div>
-          </div>
+        <div class="dl reveal">
+          <div class="dl-head"><div class="platform"><i class="fab fa-apple"></i> iOS</div><div class="badge">Sideload</div></div>
           <div class="dl-meta">Format: <span>IPA</span></div>
           <div class="dl-meta">Released: <span id="release-time-ios">...</span></div>
           <div class="dl-meta">Version: <span id="version-ios">...</span></div>
-          <a id="download-ios" class="dl-btn" target="_blank" href="#">
-            <button class="btn btn-wide"><i class="fas fa-download"></i> Download</button>
-          </a>
+          <a id="download-ios" class="dl-btn" target="_blank" href="#"><button class="btn btn-block"><i class="fas fa-download"></i> Download</button></a>
         </div>
-
-        <div class="dl">
-          <div class="dl-head">
-            <div class="platform"><i class="fas fa-mobile-screen"></i> HarmonyOS</div>
-            <div class="badge">Coming soon</div>
-          </div>
+        <div class="dl reveal reveal-d1">
+          <div class="dl-head"><div class="platform"><i class="fas fa-mobile-screen"></i> HarmonyOS</div><div class="badge">Coming soon</div></div>
           <div class="dl-meta">Plan: <span>Future support</span></div>
           <div class="dl-meta">Status: <span>In development</span></div>
           <div class="dl-meta">Version: <span>—</span></div>
-          <a class="dl-btn" href="#">
-            <button class="btn btn-wide" disabled style="opacity:.6; cursor:not-allowed;"><i
-              class="fas fa-hourglass"></i> Unavailable
-            </button>
-          </a>
+          <a class="dl-btn" href="#"><button class="btn btn-block" disabled style="opacity:.5;cursor:not-allowed"><i class="fas fa-hourglass"></i> Unavailable</button></a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- COMMUNITY -->
-  <section id="community" class="section alt">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <h2>Community voices</h2>
-          <p>What people are saying about Hachimi World</p>
-        </div>
-      </div>
+  <hr class="divider">
 
-      <div class="quotes">
-        <div class="quote">
-          <div class="stars">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-            class="fas fa-star"></i><i class="fas fa-star"></i>
-          </div>
-          <p>“Open-source governance means the community truly shapes the roadmap. It’s more
-            complete than I expected.”</p>
-          <div class="who">
-            <div class="avatar"><i class="fas fa-user"></i></div>
-            <div>
-              <div class="name">(placeholder)</div>
-              <div class="role">Electronic music producer</div>
-            </div>
-          </div>
+  <section id="community" class="section">
+    <div class="wrap section-center">
+      <div class="section-label reveal"><i class="fas fa-message-quote"></i> Community</div>
+      <h2 class="section-title reveal">Community voices</h2>
+      <p class="section-desc reveal">What people are saying about Hachimi World</p>
+      <div class="quotes-grid">
+        <div class="quote-card reveal">
+          <div class="quote-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p class="quote-text">"Open-source governance means the community truly shapes the roadmap. It's more complete than I expected."</p>
+          <div class="quote-who"><div class="quote-avatar"><i class="fas fa-user"></i></div><div><div class="quote-name">(placeholder)</div><div class="quote-role">Electronic music producer</div></div></div>
         </div>
-
-        <div class="quote">
-          <div class="stars">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-            class="fas fa-star"></i><i class="fas fa-star"></i>
-          </div>
-          <p>“As an independent musician, it’s refreshing to have a place that actually
-            listens.”</p>
-          <div class="who">
-            <div class="avatar"><i class="fas fa-user"></i></div>
-            <div>
-              <div class="name">(placeholder)</div>
-              <div class="role">Indie singer</div>
-            </div>
-          </div>
+        <div class="quote-card reveal reveal-d1">
+          <div class="quote-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p class="quote-text">"As an independent musician, it's refreshing to have a place that actually listens."</p>
+          <div class="quote-who"><div class="quote-avatar"><i class="fas fa-user"></i></div><div><div class="quote-name">(placeholder)</div><div class="quote-role">Indie singer</div></div></div>
         </div>
-
-        <div class="quote">
-          <div class="stars">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-            class="fas fa-star"></i><i class="fas fa-star"></i>
-          </div>
-          <p>“I can open a PR and implement the feature myself — that’s what a real community feels
-            like.”</p>
-          <div class="who">
-            <div class="avatar"><i class="fas fa-user"></i></div>
-            <div>
-              <div class="name">(placeholder)</div>
-              <div class="role">Developer & fan</div>
-            </div>
-          </div>
+        <div class="quote-card reveal reveal-d2">
+          <div class="quote-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p class="quote-text">"I can open a PR and implement the feature myself — that's what a real community feels like."</p>
+          <div class="quote-who"><div class="quote-avatar"><i class="fas fa-user"></i></div><div><div class="quote-name">(placeholder)</div><div class="quote-role">Developer & fan</div></div></div>
         </div>
       </div>
     </div>
   </section>
+
+  <hr class="divider">
 
   <section id="about" class="section">
-    <div class="wrap">
-      <div class="about-block">
-        <div class="resource-groups" aria-label="Project links">
-          <div>
-            <div class="pill-row">
-              <a class="pill pill-primary" href="https://github.com/HachimiWorld" target="_blank"
-                 rel="noopener">
-                <span><i class="fab fa-github"></i> Organization</span>
-              </a>
-              <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client"
-                 target="_blank" rel="noopener">
-                <span><i class="fas fa-code"></i> Repository</span>
-              </a>
-            </div>
+    <div class="wrap section-center">
+      <div class="section-label reveal"><i class="fas fa-link"></i> Links</div>
+      <h2 class="section-title reveal">Join us</h2>
+      <p class="section-desc reveal">Contribute code, report issues, join the community</p>
+      <div class="links-block reveal">
+        <div class="pill-rows">
+          <div class="pill-row" style="justify-content:center">
+            <a class="pill pill-accent" href="https://github.com/HachimiWorld" target="_blank" rel="noopener"><i class="fab fa-github"></i> Organization</a>
+            <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client" target="_blank" rel="noopener"><i class="fas fa-code"></i> Repository</a>
           </div>
-
-          <div>
-            <div class="pill-row">
-              <a class="pill"
-                 href="https://github.com/HachimiWorld/hachimi-world-client/issues/new/choose"
-                 target="_blank" rel="noopener">
-                <span><i class="fas fa-bug"></i> File an issue</span>
-              </a>
-              <a class="pill"
-                 href="https://github.com/HachimiWorld/hachimi-world-client/discussions"
-                 target="_blank" rel="noopener">
-                <span><i class="fas fa-comments"></i> Discussions</span>
-              </a>
-            </div>
+          <div class="pill-row" style="justify-content:center">
+            <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client/issues/new/choose" target="_blank" rel="noopener"><i class="fas fa-bug"></i> File an issue</a>
+            <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client/discussions" target="_blank" rel="noopener"><i class="fas fa-comments"></i> Discussions</a>
           </div>
-
-          <div>
-            <div class="pill-row">
-              <a class="pill" href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener">
-                <span><i class="fab fa-discord"></i> Discord</span>
-              </a>
-            </div>
+          <div class="pill-row" style="justify-content:center">
+            <a class="pill" href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener"><i class="fab fa-discord"></i> Discord</a>
           </div>
         </div>
       </div>
     </div>
   </section>
+
 </main>
 
-<footer>
-  <div class="wrap" style="padding:28px 0; text-align:center; color:var(--muted-2);">
-    <small>© 2026 Hachimi World · Open Source Project licensed under AGPLv3.</small>
-  </div>
-</footer>
+<footer><div class="wrap"><small>© 2026 Hachimi World · Open Source Project licensed under AGPLv3.</small></div></footer>
+
 </body>
 </html>
