@@ -1,0 +1,9 @@
+# OS / IDE
+.DS_Store
+.idea/
+*.iml
+
+# Wrangler / Node
+.wrangler/
+node_modules/
+.dev.vars*
