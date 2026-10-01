@@ -1,32 +1,34 @@
-# 基米天堂落地页
+<p align="center">
+  <picture>
+    <source srcset="public/static/logo-dark.svg" media="(prefers-color-scheme: dark)">
+    <img alt="Hachimi World" src="public/static/logo-light.svg" height="80">
+  </picture>
+</p>
 
-[hachimi.world](https://hachimi.world) 的静态站点，没有构建步骤，部署在 Cloudflare Workers（Static Assets）上。
+<h1 align="center">Hachimi World Website</h1>
 
-## 目录
+<p align="center">
+  <strong>基米天堂官网 · The website of Hachimi World</strong>
+</p>
 
-```
-public/            # 站点根目录，原样上传
-  index.html       # 中文首页
-  en/index.html    # 英文首页
-  song/song.html   # 歌曲分享页，/song/<id> 会重写到这里，前端从路径读取 id
-  static/          # 图片等静态资源
-  _redirects       # 路由规则（/app → app.hachimi.world，/song/* → 歌曲页）
-  .assetsignore    # 不上传的文件
-wrangler.jsonc     # Worker 配置
-```
+<p align="center">
+  <a href="https://hachimi.world">hachimi.world</a>
+</p>
 
-## 本地预览
+---
 
-```bash
-npx wrangler dev
-```
+## About / 关于
 
-会以线上相同的路由规则启动在 http://localhost:8787 ，可以用来检查 `_redirects`。
+This repository holds [hachimi.world](https://hachimi.world): the landing page, app downloads, and the share page for songs (`/song/<id>`).
 
-## 部署
+此仓库是 [hachimi.world](https://hachimi.world) 的源码，包括首页、各平台下载入口和歌曲分享页（`/song/<id>`）。
 
-```bash
-npx wrangler deploy
-```
+Related repositories / 相关仓库:
 
-注意：Workers 默认会把 `*.html` 重定向到去掉扩展名的地址，所以 `_redirects` 里的重写目标要写成 `/song/song`，不能写 `/song/song.html`。
+- [HachimiWorld/hachimi-world-client](https://github.com/HachimiWorld/hachimi-world-client) — App (Android, iOS, Desktop, Web) / 客户端
+- [HachimiWorld/hachimi-world-server](https://github.com/HachimiWorld/hachimi-world-server) — Backend / 后端
+
+
+## License / 许可
+
+[AGPLv3](LICENSE)
