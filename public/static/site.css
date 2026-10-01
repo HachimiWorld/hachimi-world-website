@@ -123,6 +123,7 @@ section { padding: 120px 0 0; }
 .hero { padding: 48px 0 0; position: relative; }
 .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; }
 .kicker { font-size: 13px; color: var(--text-3); letter-spacing: .12em; }
+@media (max-width: 640px) { .kicker { letter-spacing: .04em; } }
 .hero h1 {
   margin: 22px 0 0;
   font-size: clamp(46px, 7.2vw, 88px);
@@ -335,7 +336,11 @@ section { padding: 120px 0 0; }
 .platforms .go { color: var(--text-3); font-size: 13px; }
 .platforms .soon { opacity: .55; }
 @media (max-width: 960px) { .dl-grid { grid-template-columns: 1fr; } }
-@media (max-width: 640px) { .dl-main { padding: 24px; } .dl-main h3 { font-size: 26px; } }
+@media (max-width: 640px) {
+  .dl-main { padding: 24px; }
+  .dl-main h3 { font-size: 26px; }
+  .platforms .v.url { display: none; }
+}
 
 /* ---------- open source ---------- */
 .oss {
@@ -365,7 +370,10 @@ section { padding: 120px 0 0; }
 .btn-line { border: 1.5px solid rgba(29, 18, 8, .35); }
 .btn-line:hover { background: rgba(255, 255, 255, .2); }
 @media (max-width: 860px) { .oss { padding: 40px 24px; } .repos { grid-template-columns: 1fr; } }
-@media (max-width: 640px) { .oss { border-radius: 22px; margin: 0 -4px; } }
+@media (max-width: 640px) {
+  .oss { border-radius: 22px; margin: 0 -4px; }
+  .oss::before { font-size: 240px; right: -24px; bottom: -64px; }
+}
 
 /* ---------- footer ---------- */
 footer { padding: 72px 0 48px; color: var(--text-3); font-size: 14px; }

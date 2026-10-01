@@ -252,7 +252,7 @@
       <li><a href="${WEB_APP}" class="${mainKey === 'web' ? 'current' : ''}">
         <i class="p fas fa-globe"></i>
         <div><div class="name">${T.web}</div><div class="note">${T.webNote}</div></div>
-        <span class="v">app.hachimi.world</span><i class="go fas fa-arrow-up-right-from-square"></i></a></li>
+        <span class="v url">app.hachimi.world</span><i class="go fas fa-arrow-up-right-from-square"></i></a></li>
       <li><div class="soon">
         <i class="p fas fa-mobile-screen"></i>
         <div><div class="name">HarmonyOS</div><div class="note">${T.harmonyNote}</div></div>
