@@ -5,6 +5,8 @@
   "assets": {
     "directory": "./public"
   },
+  // Required by `wrangler preview`, which Workers Builds runs for non-production branches.
+  "previews": {},
   "observability": {
     "logs": {
       "enabled": true,
