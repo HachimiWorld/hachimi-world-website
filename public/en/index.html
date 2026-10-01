@@ -1,41 +1,40 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hachimi World - An open-source community to discover and share Hachimi music</title>
 
-  <!-- Theme init BEFORE paint to prevent flash -->
+  <!-- Theme init before paint to prevent a flash -->
   <script>
-    (function(){
-      var t = localStorage.getItem('theme');
-      if (!t) t = matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', t);
-    })();
+    (function () {
+      var t = null
+      try { t = localStorage.getItem('theme') } catch (e) {}
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      document.documentElement.setAttribute('data-theme', t)
+    })()
   </script>
 
   <!-- SEO -->
-  <meta name="description" content="Hachimi World — a community-driven open-source music project focused on discovering and sharing Hachimi music, connecting creators and fans.">
-  <meta name="keywords" content="Hachimi, Hachimi World, open source, music, community">
+  <meta name="description" content="Hachimi World is an open-source Hachimi music community maintained by enthusiasts. Listen to, publish and collect Hachimi music.">
+  <meta name="keywords" content="Hachimi, Hachimi World, 哈基米, 基米天堂, open source, music community">
   <meta name="author" content="HachimiWorld">
   <link rel="canonical" href="https://hachimi.world/en/">
   <link rel="alternate" href="https://hachimi.world/" hreflang="zh-CN">
   <link rel="alternate" href="https://hachimi.world/en/" hreflang="en">
   <meta name="robots" content="index,follow">
-  <meta name="googlebot" content="index,follow">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="Hachimi World">
-  <meta property="og:title" content="Hachimi World (WIP) - An open-source community to discover and share Hachimi music">
-  <meta property="og:description" content="Hachimi World — a community-driven open-source music project focused on discovering and sharing Hachimi music, connecting creators and fans.">
+  <meta property="og:title" content="Hachimi World - An open-source community to discover and share Hachimi music">
+  <meta property="og:description" content="Hachimi World is an open-source Hachimi music community maintained by enthusiasts. Listen to, publish and collect Hachimi music.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://hachimi.world/en/">
   <meta property="og:image" content="https://hachimi.world/static/og-image.png">
   <meta property="og:locale" content="en_US">
 
-  <meta name="theme-color" id="theme-meta" content="#1a1918">
+  <meta name="theme-color" id="theme-meta" content="#FBF8F3">
 
-  <!-- Structured data -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -44,16 +43,12 @@
           "@type": "WebSite",
           "url": "https://hachimi.world/en/",
           "name": "Hachimi World",
-          "description": "A community-driven open-source music project",
-          "publisher": {
-            "@type": "Organization",
-            "name": "HachimiWorld",
-            "url": "https://hachimi.world/",
-            "logo": { "@type": "ImageObject", "url": "https://hachimi.world/static/logo-dark.svg" }
-          }
+          "description": "An open-source community to discover and share Hachimi music",
+          "publisher": { "@id": "https://hachimi.world/#org" }
         },
         {
           "@type": "Organization",
+          "@id": "https://hachimi.world/#org",
           "name": "HachimiWorld",
           "url": "https://hachimi.world/",
           "logo": "https://hachimi.world/static/logo-dark.svg"
@@ -64,1088 +59,186 @@
 
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
-
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      fetchVersion(['windows','macos','linux','android','ios']).catch(()=>{})
-      initReveal()
-      initCarousel()
-      initTheme()
-    })
-
-    async function fetchVersion(platforms) {
-      const variants = platforms.map(p => "release-" + p)
-      try {
-        const resp = await fetch('https://api.hachimi.world/version/latest_batch', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ variants })
-        })
-        const data = await resp.json()
-        if (data.ok) {
-          for (let platform of platforms) {
-            const variant = "release-" + platform
-            const versionData = data.data.find(v => v.variant === variant)
-            if (!versionData) continue
-            const versionEl = document.getElementById('version-' + platform)
-            const downloadEl = document.getElementById('download-' + platform)
-            const timeEl = document.getElementById('release-time-' + platform)
-            if (versionEl) versionEl.textContent = versionData.version_name
-            if (downloadEl) downloadEl.href = versionData.url
-            if (timeEl) timeEl.textContent = new Date(versionData.release_time).toLocaleString('en-US', {
-              year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
-            })
-          }
-        }
-      } catch (e) { console.warn('fetchVersion failed', e) }
-    }
-
-    function initReveal() {
-      const els = document.querySelectorAll('.reveal')
-      if (!els.length) return
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target) } })
-      }, { threshold: 0.08 })
-      els.forEach(el => io.observe(el))
-    }
-
-    function initCarousel() {
-      const dSlides = document.querySelectorAll('.carousel-desktop .c-slide')
-      const mSlides = document.querySelectorAll('.carousel-mobile .c-slide')
-      const dots = document.querySelectorAll('.c-dot')
-      const labelEl = document.getElementById('carousel-label')
-      const labels = ['Home · Light', 'Home · Dark', 'Player']
-      let cur = 0, total = dSlides.length
-      if (!total) return
-
-      function goTo(i) {
-        dSlides[cur].classList.remove('active')
-        mSlides[cur].classList.remove('active')
-        dots[cur].classList.remove('active')
-        cur = ((i % total) + total) % total
-        dSlides[cur].classList.add('active')
-        mSlides[cur].classList.add('active')
-        dots[cur].classList.add('active')
-        if (labelEl) labelEl.textContent = labels[cur]
-      }
-
-      dots.forEach((d, i) => d.addEventListener('click', () => { goTo(i); reset() }))
-
-      let timer = setInterval(() => goTo(cur + 1), 3000)
-      function reset() { clearInterval(timer); timer = setInterval(() => goTo(cur + 1), 3000) }
-
-      const el = document.getElementById('carousel')
-      if (el) {
-        el.addEventListener('mouseenter', () => clearInterval(timer))
-        el.addEventListener('mouseleave', () => { timer = setInterval(() => goTo(cur + 1), 3000) })
-      }
-    }
-
-    function initTheme() {
-      const btn = document.getElementById('theme-toggle')
-      if (!btn) return
-      const meta = document.getElementById('theme-meta')
-      if (meta) meta.content = document.documentElement.getAttribute('data-theme') === 'light' ? '#f5f3f0' : '#1a1918'
-
-      btn.addEventListener('click', () => {
-        const html = document.documentElement
-        const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
-        html.setAttribute('data-theme', next)
-        localStorage.setItem('theme', next)
-        if (meta) meta.content = next === 'light' ? '#f5f3f0' : '#1a1918'
-      })
-    }
-  </script>
-
-  <style>
-    :root {
-      --accent: #FF782F;
-      --accent-2: #FF9A5C;
-      --bg: #131211;
-      --bg-2: #1a1918;
-      --text: #f0ede8;
-      --text-2: rgba(240, 237, 232, 0.72);
-      --text-3: rgba(240, 237, 232, 0.46);
-      --surface: rgba(255, 255, 255, 0.05);
-      --surface-2: rgba(255, 255, 255, 0.08);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-2: rgba(255, 255, 255, 0.04);
-      --shadow: 0 4px 32px rgba(0, 0, 0, 0.25);
-      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
-      --radius: 16px;
-      --radius-lg: 24px;
-      --container: 1140px;
-      --container-pad: clamp(16px, 3vw, 24px);
-      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    html[data-theme="light"] {
-      --accent: #FF7022;
-      --accent-2: #E85D10;
-      --bg: #f5f3f0;
-      --bg-2: #eae7e3;
-      --text: #1a1918;
-      --text-2: rgba(26, 25, 24, 0.68);
-      --text-3: rgba(26, 25, 24, 0.42);
-      --surface: rgba(255, 255, 255, 0.72);
-      --surface-2: rgba(255, 255, 255, 0.92);
-      --border: rgba(0, 0, 0, 0.07);
-      --border-2: rgba(0, 0, 0, 0.04);
-      --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.1);
-    }
-
-    html[data-theme="dark"] .logo-light,
-    html[data-theme="light"] .logo-dark { display: none !important; }
-
-    html[data-theme="dark"] .icon-moon,
-    html[data-theme="light"] .icon-sun { display: none !important; }
-
-    *, *::before, *::after { box-sizing: border-box; }
-
-    html {
-      width: 100%;
-      max-width: 100%;
-      overflow-x: clip;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      width: 100%;
-      max-width: 100%;
-      margin: 0;
-      font-family: var(--font);
-      color: var(--text);
-      background: var(--bg);
-      overflow-x: clip;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
-    button { font: inherit; }
-
-    .wrap {
-      width: 100%;
-      max-width: var(--container);
-      margin: 0 auto;
-      padding-inline: var(--container-pad);
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity .7s cubic-bezier(.22, 1, .36, 1), transform .7s cubic-bezier(.22, 1, .36, 1);
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    .reveal-d1 { transition-delay: .08s; }
-    .reveal-d2 { transition-delay: .16s; }
-    .reveal-d3 { transition-delay: .24s; }
-
-    .nav {
-      position: fixed;
-      inset: 0 0 auto;
-      z-index: 100;
-      background: color-mix(in srgb, var(--bg) 80%, transparent);
-      backdrop-filter: blur(20px) saturate(1.4);
-      -webkit-backdrop-filter: blur(20px) saturate(1.4);
-      border-bottom: 1px solid var(--border-2);
-    }
-
-    .nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      min-width: 0;
-      padding-block: 12px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-
-    .brand img {
-      width: auto;
-      height: 34px;
-      max-width: min(180px, 100%);
-    }
-
-    .nav-links {
-      display: none;
-      align-items: center;
-      gap: 24px;
-      flex: 0 1 auto;
-      min-width: 0;
-    }
-
-    .nav-links a {
-      color: var(--text-2);
-      font-size: 14px;
-      font-weight: 500;
-      transition: color .2s;
-      white-space: nowrap;
-    }
-
-    .nav-links a:hover { color: var(--accent); }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      flex: 0 0 auto;
-      min-width: 0;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-height: 38px;
-      padding: 7px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface);
-      color: var(--text-2);
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1;
-      cursor: pointer;
-      transition: all .2s;
-      white-space: nowrap;
-      flex: 0 0 auto;
-    }
-
-    .chip:hover {
-      background: var(--surface-2);
-      color: var(--text);
-    }
-
-    .hide-mobile { display: inline; }
-
-    .hero {
-      position: relative;
-      padding-top: 110px;
-      text-align: center;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: min(700px, 90vw);
-      height: min(420px, 52vw);
-      transform: translateX(-50%);
-      background: radial-gradient(ellipse, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 680px;
-      margin: 0 auto;
-    }
-
-    .kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      margin-bottom: 18px;
-      border-radius: 999px;
-      border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
-      background: color-mix(in srgb, var(--accent) 10%, transparent);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .hero h1 {
-      margin: 0 0 14px;
-      font-size: clamp(28px, 5.5vw, 54px);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-    }
-
-    .grad {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .hero-sub {
-      max-width: 480px;
-      margin: 0 auto 24px;
-      color: var(--text-2);
-      font-size: clamp(14px, 2.2vw, 17px);
-      line-height: 1.6;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 44px;
-      padding: 11px 20px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--surface);
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1;
-      cursor: pointer;
-      transition: all .2s;
-      white-space: nowrap;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      background: var(--surface-2);
-    }
-
-    .btn-accent {
-      border-color: transparent;
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 35%, transparent);
-    }
-
-    .btn-accent:hover {
-      background: color-mix(in srgb, var(--accent) 88%, #fff);
-    }
-
-    .hero-carousel {
-      position: relative;
-      width: 100%;
-      max-width: 920px;
-      margin: 48px auto 0;
-      padding-bottom: 28px;
-    }
-
-    .carousel-desktop {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 3 / 2;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      background: var(--surface);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .carousel-desktop .c-slide,
-    .carousel-mobile .c-slide {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity .8s ease;
-    }
-
-    .carousel-desktop .c-slide.active,
-    .carousel-mobile .c-slide.active {
-      opacity: 1;
-    }
-
-    .carousel-mobile {
-      position: absolute;
-      right: 4%;
-      bottom: -16px;
-      width: min(170px, 18%);
-      aspect-ratio: 1200 / 2670;
-      overflow: hidden;
-      border: 2px solid var(--border);
-      border-radius: 16px;
-      background: var(--surface);
-      box-shadow: var(--shadow-lg);
-      z-index: 5;
-    }
-
-    .carousel-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      margin-top: 32px;
-      flex-wrap: wrap;
-    }
-
-    .carousel-dots {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .c-dot {
-      width: 8px;
-      height: 8px;
-      padding: 0;
-      border: none;
-      border-radius: 999px;
-      background: var(--text-3);
-      cursor: pointer;
-      transition: all .3s;
-      flex: 0 0 auto;
-    }
-
-    .c-dot.active {
-      width: 28px;
-      border-radius: 4px;
-      background: var(--accent);
-    }
-
-    .carousel-label {
-      color: var(--text-3);
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .hero-carousel::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 28px;
-      height: 80px;
-      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-      background: linear-gradient(to top, var(--bg), transparent);
-      pointer-events: none;
-      z-index: 3;
-    }
-
-    .stats-strip {
-      padding-top: 40px;
-    }
-
-    .stats-row {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 32px;
-    }
-
-    .stat-item {
-      min-width: 100px;
-      text-align: center;
-    }
-
-    .stat-item .val {
-      margin-bottom: 3px;
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .stat-item .label {
-      color: var(--text-3);
-      font-size: 12px;
-    }
-
-    .section {
-      padding: 64px 0;
-    }
-
-    .section-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: .05em;
-      text-transform: uppercase;
-    }
-
-    .section-title {
-      margin: 0 0 8px;
-      font-size: clamp(22px, 3vw, 30px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .section-desc {
-      max-width: 52ch;
-      margin: 0 auto 32px;
-      color: var(--text-2);
-      font-size: 15px;
-      line-height: 1.6;
-    }
-
-    .section-center { text-align: center; }
-
-    .divider {
-      margin: 0;
-      border: none;
-      border-top: 1px solid var(--border-2);
-    }
-
-    .features-grid,
-    .quotes-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .feat,
-    .quote-card,
-    .dl,
-    .links-block {
-      border: 1px solid var(--border);
-      background: var(--surface);
-      box-shadow: none;
-    }
-
-    .feat {
-      padding: 22px;
-      border-radius: var(--radius);
-      transition: transform .3s, box-shadow .3s;
-    }
-
-    .feat:hover,
-    .dl:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .feat-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      margin-bottom: 14px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #fff;
-      font-size: 17px;
-    }
-
-    .feat h3 {
-      margin: 0 0 6px;
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    .feat p {
-      margin: 0;
-      color: var(--text-2);
-      font-size: 13px;
-      line-height: 1.65;
-    }
-
-    .download-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 12px;
-    }
-
-    .dl {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 18px;
-      border-radius: var(--radius);
-      transition: transform .25s, box-shadow .25s;
-    }
-
-    .dl-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .dl-head .platform {
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .dl-head .badge {
-      padding: 3px 10px;
-      border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
-      border-radius: 999px;
-      background: color-mix(in srgb, var(--accent) 14%, transparent);
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .dl-meta {
-      color: var(--text-3);
-      font-size: 12px;
-    }
-
-    .dl-meta span { color: var(--text-2); }
-    .dl .dl-btn { margin-top: auto; }
-    .btn-block { width: 100%; }
-
-    .quote-card {
-      display: flex;
-      flex-direction: column;
-      padding: 22px;
-      border-radius: var(--radius);
-    }
-
-    .quote-stars {
-      display: flex;
-      gap: 3px;
-      margin-bottom: 12px;
-      color: #f59e0b;
-      font-size: 12px;
-    }
-
-    .quote-text {
-      flex: 1;
-      margin: 0 0 14px;
-      color: var(--text-2);
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
-    .quote-who {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .quote-avatar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 34px;
-      height: 34px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface-2);
-      color: var(--text-3);
-      font-size: 13px;
-      flex: 0 0 auto;
-    }
-
-    .quote-name {
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .quote-role {
-      color: var(--text-3);
-      font-size: 11px;
-    }
-
-    .links-block {
-      display: inline-block;
-      padding: 24px;
-      border-radius: var(--radius-lg);
-    }
-
-    .pill-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .pill-row {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 40px;
-      padding: 9px 14px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: var(--surface);
-      color: var(--text-2);
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-      transition: all .2s;
-    }
-
-    .pill:hover {
-      transform: translateY(-1px);
-      background: var(--surface-2);
-      color: var(--text);
-    }
-
-    .pill-accent {
-      border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-      background: color-mix(in srgb, var(--accent) 12%, transparent);
-      color: var(--accent);
-    }
-
-    .pill-accent:hover {
-      background: color-mix(in srgb, var(--accent) 20%, transparent);
-      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-    }
-
-    footer {
-      padding: 28px 0;
-      border-top: 1px solid var(--border-2);
-      text-align: center;
-    }
-
-    footer small {
-      color: var(--text-3);
-      font-size: 12px;
-    }
-
-    @media (min-width: 861px) {
-      .nav-links { display: flex; }
-    }
-
-    @media (max-width: 860px) {
-      .features-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .quotes-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .nav-inner {
-        gap: 8px;
-        padding-block: 10px;
-      }
-
-      .brand {
-        flex: 1 1 0;
-      }
-
-      .brand img {
-        height: 28px;
-        width: auto;
-        max-width: min(124px, 32vw);
-      }
-
-      .nav-actions {
-        gap: 4px;
-      }
-
-      .chip {
-        min-width: 36px;
-        min-height: 34px;
-        padding: 6px 8px;
-        font-size: 12px;
-        gap: 4px;
-      }
-
-      .hide-mobile { display: none; }
-
-      .hero {
-        padding-top: 90px;
-      }
-
-      .hero h1 {
-        font-size: clamp(26px, 7vw, 36px);
-      }
-
-      .hero-sub {
-        font-size: 14px;
-      }
-
-      .kicker {
-        padding: 5px 12px;
-        font-size: 11px;
-      }
-
-      .actions {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      .actions .btn {
-        width: 100%;
-      }
-
-      .hero-carousel {
-        max-width: 100%;
-        margin-top: 32px;
-        padding-bottom: 0;
-      }
-
-      .carousel-desktop {
-        display: none;
-      }
-
-      .carousel-mobile {
-        position: relative;
-        right: auto;
-        bottom: auto;
-        width: min(320px, calc(100vw - (var(--container-pad) * 2) - 24px));
-        max-width: 100%;
-        margin: 0 auto;
-        border-radius: 18px;
-      }
-
-      .hero-carousel::after {
-        display: none;
-      }
-
-      .carousel-controls {
-        margin-top: 20px;
-      }
-
-      .stats-row {
-        align-items: center;
-        flex-direction: column;
-        gap: 14px;
-      }
-
-      .section {
-        padding: 48px 0;
-      }
-
-      .features-grid,
-      .download-grid,
-      .quotes-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .links-block {
-        display: block;
-      }
-
-      .pill {
-        width: 100%;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="/static/site.css">
+  <script src="/static/site.js" defer></script>
 </head>
 <body>
 
-<nav class="nav">
-  <div class="wrap nav-inner">
-    <a href="/en/" class="brand">
-      <img class="logo-dark" src="/static/logo-dark.svg" alt="Hachimi World" height="34">
-      <img class="logo-light" src="/static/logo-light.svg" alt="Hachimi World" height="34">
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/" aria-label="Hachimi World">
+      <img class="only-light" src="/static/logo-light.svg" alt="Hachimi World">
+      <img class="only-dark" src="/static/logo-dark.svg" alt="Hachimi World">
     </a>
-    <div class="nav-links" role="navigation">
-      <a href="#features">Features</a>
+    <nav class="nav-links">
+      <a href="#chart">This Week</a>
+      <a href="#app">Apps</a>
       <a href="#download">Download</a>
-      <a href="#community">Community</a>
-      <a href="#about">About</a>
-    </div>
-    <div class="nav-actions">
-      <button id="theme-toggle" class="chip" title="Toggle light/dark" aria-label="Toggle theme">
-        <i class="fas fa-sun icon-sun"></i>
-        <i class="fas fa-moon icon-moon"></i>
+      <a href="#oss">Open Source</a>
+    </nav>
+    <div class="nav-right">
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle light/dark theme">
+        <i class="fas fa-moon only-light"></i><i class="fas fa-sun only-dark"></i>
       </button>
-      <a href="/" class="chip" title="切换到中文">中文</a>
-      <a href="https://github.com/HachimiWorld" class="chip" target="_blank" rel="noopener"><i class="fab fa-github"></i><span class="hide-mobile"> GitHub</span></a>
+      <a class="icon-btn lang" href="/" aria-label="中文">中</a>
+      <a class="icon-btn" href="https://github.com/HachimiWorld" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+      <a class="btn btn-ghost btn-sm btn-open-web" href="https://app.hachimi.world">Web</a>
     </div>
   </div>
-</nav>
+</header>
 
 <main>
-
+  <!-- HERO -->
   <section class="hero">
-    <div class="wrap">
-      <div class="hero-content reveal">
-        <div class="kicker"><i class="fas fa-bolt"></i> Community-driven · Open Source · Built with love</div>
-        <h1>Discover and share your favorite<br><span class="grad">Hachimi music</span></h1>
-        <p class="hero-sub">An open-source music platform made by the community, connecting creators and fans</p>
-        <div class="actions">
-          <a href="#download" class="btn btn-accent"><i class="fas fa-download"></i> Download</a>
-          <a href="#features" class="btn"><i class="fas fa-circle-info"></i> Learn more</a>
-          <a href="/app/" class="btn"><i class="fas fa-globe"></i> Web (Experimental)</a>
+    <div class="wrap hero-grid">
+      <div>
+        <div class="kicker">Open source · Community-driven · A labour of love</div>
+        <h1>Hachimi World<em>A Hachimi music community</em></h1>
+        <p class="hero-sub">Listen to, publish and collect Hachimi music.<br>Maintained by enthusiasts, open source under AGPLv3.</p>
+        <div class="hero-cta">
+          <a class="btn btn-accent" id="hero-dl" href="#download"><i class="fas fa-download"></i><span>Download</span></a>
+          <a class="btn btn-ghost" href="https://app.hachimi.world">Web app <i class="fas fa-arrow-right"></i></a>
         </div>
+        <p class="hero-note" id="hero-note">Windows · macOS · Linux · Android · iOS · Web</p>
       </div>
 
-      <div class="hero-carousel reveal reveal-d2" id="carousel">
-        <div class="carousel-desktop">
-          <img class="c-slide active" src="/static/screenshot-desktop-light.webp" alt="Desktop light mode" width="2400" height="1600">
-          <img class="c-slide" src="/static/screenshot-desktop-dark.webp" alt="Desktop dark mode" width="2400" height="1600">
-          <img class="c-slide" src="/static/screenshot-desktop-player.webp" alt="Desktop player" width="2400" height="1600">
-        </div>
-        <div class="carousel-mobile">
-          <img class="c-slide active" src="/static/screenshot-mobile-light.webp" alt="Mobile light mode" width="1200" height="2670">
-          <img class="c-slide" src="/static/screenshot-mobile-dark.webp" alt="Mobile dark mode" width="1200" height="2670">
-          <img class="c-slide" src="/static/screenshot-mobile-player.webp" alt="Mobile player" width="1200" height="2670">
-        </div>
-        <div class="carousel-controls">
-          <div class="carousel-dots">
-            <button class="c-dot active" data-idx="0" aria-label="Slide 1"></button>
-            <button class="c-dot" data-idx="1" aria-label="Slide 2"></button>
-            <button class="c-dot" data-idx="2" aria-label="Slide 3"></button>
-          </div>
-          <div class="carousel-label" id="carousel-label">Home · Light</div>
-        </div>
+      <div class="wall-box">
+        <div class="wall" id="wall" aria-hidden="true"></div>
+        <a class="now" id="now"></a>
       </div>
     </div>
   </section>
 
-  <div class="stats-strip">
+  <!-- CHART -->
+  <section id="chart">
     <div class="wrap">
-      <div class="stats-row reveal">
-        <div class="stat-item"><div class="val">AGPLv3</div><div class="label">Fully open-source</div></div>
-        <div class="stat-item"><div class="val">Multi-platform</div><div class="label">Win · macOS · Linux · Android · iOS · Web</div></div>
-        <div class="stat-item"><div class="val">Community-driven</div><div class="label">Built with love · No commercial content</div></div>
+      <div class="sec-head">
+        <div>
+          <span class="label">01</span>
+          <h2 class="title">This Week</h2>
+        </div>
+        <a class="more" href="https://app.hachimi.world">Full chart <i class="fas fa-arrow-right"></i></a>
+      </div>
+      <div class="chart">
+        <a class="top1" id="top1"></a>
+        <ol class="list" id="list"></ol>
       </div>
     </div>
+  </section>
+
+  <!-- GENRES -->
+  <div class="genres">
+    <div class="wrap genres-head">
+      <span class="label">02</span>
+      <h3>Genres</h3>
+      <p>Tags from community works</p>
+    </div>
+    <div class="marquee"><div class="marquee-track" id="mq1"></div></div>
+    <div class="marquee rev"><div class="marquee-track" id="mq2"></div></div>
   </div>
 
-  <hr class="divider" style="margin-top:40px;">
-
-  <section id="features" class="section">
-    <div class="wrap section-center">
-      <div class="section-label reveal"><i class="fas fa-sparkles"></i> Features</div>
-      <h2 class="section-title reveal">Why Hachimi World</h2>
-      <p class="section-desc reveal">Built for creators and fans of Hachimi music — open, community-driven, and focused on real needs</p>
-      <div class="features-grid">
-        <div class="feat reveal"><div class="feat-icon"><i class="fas fa-compass"></i></div><h3>Explore</h3><p>Discover Hachimi tracks and creators in a community tailored for this culture</p></div>
-        <div class="feat reveal reveal-d1"><div class="feat-icon"><i class="fas fa-microphone-alt"></i></div><h3>Create</h3><p>Share your work, collaborate, and help shape the culture with people who get it</p></div>
-        <div class="feat reveal reveal-d2"><div class="feat-icon"><i class="fas fa-heart"></i></div><h3>Community-first</h3><p>Fully open-source. No commercial content. Features are driven by real community feedback</p></div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <section id="download" class="section">
+  <!-- VOICES -->
+  <section id="voices">
     <div class="wrap">
-      <div class="section-center">
-        <div class="section-label reveal"><i class="fas fa-arrow-down-to-line"></i> Download</div>
-        <h2 class="section-title reveal">Download the latest client</h2>
-        <p class="section-desc reveal">All builds are published automatically via GitHub Actions</p>
+      <span class="label">03</span>
+      <h2 class="title">Voices of the Community</h2>
+      <div class="voices">
+        <figure class="voice">
+          <span class="role">Listener</span>
+          <blockquote>Free from commercial interference,<br>steered by its community.</blockquote>
+          <cite>— Made up</cite>
+          <a class="voice-link" href="#download">Download <i class="fas fa-arrow-right"></i></a>
+        </figure>
+        <figure class="voice">
+          <span class="role">Creator</span>
+          <blockquote>My work has found a home,<br>and listeners who truly listen.</blockquote>
+          <cite>— Made up</cite>
+          <a class="voice-link" href="https://app.hachimi.world">Creator Center <i class="fas fa-arrow-right"></i></a>
+        </figure>
+        <figure class="voice">
+          <span class="role">Developer</span>
+          <blockquote>As a developer,<br>I build the features I need myself.</blockquote>
+          <cite>— Made up</cite>
+          <a class="voice-link" href="https://github.com/HachimiWorld" target="_blank" rel="noopener">GitHub <i class="fas fa-arrow-right"></i></a>
+        </figure>
       </div>
-      <div class="download-grid">
-        <div class="dl reveal">
-          <div class="dl-head"><div class="platform"><i class="fab fa-windows"></i> Windows</div><div class="badge">Stable</div></div>
-          <div class="dl-meta">OS: <span>Windows 10+</span></div>
-          <div class="dl-meta">Released: <span id="release-time-windows">...</span></div>
-          <div class="dl-meta">Version: <span id="version-windows">...</span></div>
-          <a id="download-windows" class="dl-btn" target="_blank" href="#"><button class="btn btn-block"><i class="fas fa-download"></i> Download</button></a>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section id="app">
+    <div class="wrap app-grid">
+      <div>
+        <span class="label">04</span>
+        <h2 class="title">Apps</h2>
+        <p class="lead">Windows, macOS, Linux, Android, iOS, and the web.</p>
+        <ul class="features">
+          <li><div class="ico"><i class="fas fa-wand-magic-sparkles"></i></div><div><b>Daily Picks &amp; Weekly Hits</b><span>Picks refresh daily; hits are tallied weekly.</span></div></li>
+          <li><div class="ico"><i class="fas fa-list-ul"></i></div><div><b>Playlists &amp; Following</b><span>Collect songs, follow creators, browse public playlists.</span></div></li>
+          <li><div class="ico"><i class="fas fa-pen-nib"></i></div><div><b>Creator Center</b><span>Publish your work. Every song gets its own ID and share page, such as JM-WYZ-008.</span></div></li>
+          <li><div class="ico"><i class="fas fa-closed-captioning"></i></div><div><b>Lyrics &amp; Player</b><span>Synced lyrics, in light and dark themes.</span></div></li>
+        </ul>
+      </div>
+      <div class="devices">
+        <div class="device-desktop">
+          <img class="only-light" src="/static/screenshot-desktop-light.webp" alt="Hachimi World desktop home" width="2400" height="1600" loading="lazy">
+          <img class="only-dark" src="/static/screenshot-desktop-dark.webp" alt="Hachimi World desktop home" width="2400" height="1600" loading="lazy">
         </div>
-        <div class="dl reveal reveal-d1">
-          <div class="dl-head"><div class="platform"><i class="fab fa-apple"></i> macOS</div><div class="badge">Apple Silicon</div></div>
-          <div class="dl-meta">Chip: <span>M series</span></div>
-          <div class="dl-meta">Released: <span id="release-time-macos">...</span></div>
-          <div class="dl-meta">Version: <span id="version-macos">...</span></div>
-          <a id="download-macos" class="dl-btn" target="_blank" href="#"><button class="btn btn-block"><i class="fas fa-download"></i> Download</button></a>
-        </div>
-        <div class="dl reveal reveal-d2">
-          <div class="dl-head"><div class="platform"><i class="fab fa-linux"></i> Linux</div><div class="badge">DEB</div></div>
-          <div class="dl-meta">Distros: <span>Ubuntu / Debian</span></div>
-          <div class="dl-meta">Released: <span id="release-time-linux">...</span></div>
-          <div class="dl-meta">Version: <span id="version-linux">...</span></div>
-          <a id="download-linux" class="dl-btn" target="_blank" href="#"><button class="btn btn-block"><i class="fas fa-download"></i> Download</button></a>
-        </div>
-        <div class="dl reveal reveal-d3">
-          <div class="dl-head"><div class="platform"><i class="fab fa-android"></i> Android</div><div class="badge">APK</div></div>
-          <div class="dl-meta">OS: <span>Android 9+</span></div>
-          <div class="dl-meta">Released: <span id="release-time-android">...</span></div>
-          <div class="dl-meta">Version: <span id="version-android">...</span></div>
-          <a id="download-android" class="dl-btn" target="_blank" href="#"><button class="btn btn-block"><i class="fas fa-download"></i> Download</button></a>
-        </div>
-        <div class="dl reveal">
-          <div class="dl-head"><div class="platform"><i class="fab fa-apple"></i> iOS</div><div class="badge">Sideload</div></div>
-          <div class="dl-meta">Format: <span>IPA</span></div>
-          <div class="dl-meta">Released: <span id="release-time-ios">...</span></div>
-          <div class="dl-meta">Version: <span id="version-ios">...</span></div>
-          <a id="download-ios" class="dl-btn" target="_blank" href="#"><button class="btn btn-block"><i class="fas fa-download"></i> Download</button></a>
-        </div>
-        <div class="dl reveal reveal-d1">
-          <div class="dl-head"><div class="platform"><i class="fas fa-mobile-screen"></i> HarmonyOS</div><div class="badge">Coming soon</div></div>
-          <div class="dl-meta">Plan: <span>Future support</span></div>
-          <div class="dl-meta">Status: <span>In development</span></div>
-          <div class="dl-meta">Version: <span>—</span></div>
-          <a class="dl-btn" href="#"><button class="btn btn-block" disabled style="opacity:.5;cursor:not-allowed"><i class="fas fa-hourglass"></i> Unavailable</button></a>
+        <div class="device-phone">
+          <img src="/static/screenshot-mobile-player.webp" alt="Hachimi World mobile player" width="1200" height="2670" loading="lazy">
         </div>
       </div>
     </div>
   </section>
 
-  <hr class="divider">
-
-  <section id="community" class="section">
-    <div class="wrap section-center">
-      <div class="section-label reveal"><i class="fas fa-message-quote"></i> Community</div>
-      <h2 class="section-title reveal">Community voices</h2>
-      <p class="section-desc reveal">What people are saying about Hachimi World</p>
-      <div class="quotes-grid">
-        <div class="quote-card reveal">
-          <div class="quote-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-          <p class="quote-text">"The open-source model lets the community push the project in genuinely meaningful directions. The experience is far better than commercial apps."</p>
-          <div class="quote-who"><div class="quote-avatar"><i class="fas fa-user"></i></div><div><div class="quote-name">(placeholder)</div><div class="quote-role">Music enthusiast</div></div></div>
-        </div>
-        <div class="quote-card reveal reveal-d1">
-          <div class="quote-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-          <p class="quote-text">"As an independent musician, I finally have a place that truly feels like my own."</p>
-          <div class="quote-who"><div class="quote-avatar"><i class="fas fa-user"></i></div><div><div class="quote-name">(placeholder)</div><div class="quote-role">Independent musician</div></div></div>
-        </div>
-        <div class="quote-card reveal reveal-d2">
-          <div class="quote-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-          <p class="quote-text">"As a developer, I can open a PR and build the features I personally want. That's what a real community is."</p>
-          <div class="quote-who"><div class="quote-avatar"><i class="fas fa-user"></i></div><div><div class="quote-name">(placeholder)</div><div class="quote-role">Independent developer</div></div></div>
-        </div>
+  <!-- DOWNLOAD -->
+  <section id="download">
+    <div class="wrap">
+      <span class="label">05</span>
+      <h2 class="title">Download</h2>
+      <div class="dl-grid">
+        <div class="dl-main" id="dl-main"></div>
+        <ul class="platforms" id="platforms"></ul>
       </div>
     </div>
   </section>
 
-  <hr class="divider">
-
-  <section id="about" class="section">
-    <div class="wrap section-center">
-      <div class="section-label reveal"><i class="fas fa-link"></i> Links</div>
-      <h2 class="section-title reveal">Join us</h2>
-      <p class="section-desc reveal">Join the community, share feedback, and contribute</p>
-      <div class="links-block reveal">
-        <div class="pill-rows">
-          <div class="pill-row" style="justify-content:center">
-            <a class="pill pill-accent" href="https://github.com/HachimiWorld" target="_blank" rel="noopener"><i class="fab fa-github"></i> Organization</a>
-            <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client" target="_blank" rel="noopener"><i class="fas fa-code"></i> Repository</a>
-          </div>
-          <div class="pill-row" style="justify-content:center">
-            <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client/issues/new/choose" target="_blank" rel="noopener"><i class="fas fa-bug"></i> File an issue</a>
-            <a class="pill" href="https://github.com/HachimiWorld/hachimi-world-client/discussions" target="_blank" rel="noopener"><i class="fas fa-comments"></i> Discussions</a>
-          </div>
-          <div class="pill-row" style="justify-content:center">
-            <a class="pill" href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener"><i class="fab fa-discord"></i> Discord</a>
-          </div>
+  <!-- OPEN SOURCE -->
+  <section id="oss">
+    <div class="wrap">
+      <div class="oss">
+        <span class="label">06</span>
+        <h2 class="title">Open Source</h2>
+        <p class="lead">The client, the server and this website are open source under AGPLv3, built and maintained by enthusiasts, with no commercial content.</p>
+        <div class="repos">
+          <a class="repo" href="https://github.com/HachimiWorld/hachimi-world-client" target="_blank" rel="noopener"><b>hachimi-world-client</b><span>Kotlin Multiplatform · Compose</span></a>
+          <a class="repo" href="https://github.com/HachimiWorld/hachimi-world-server" target="_blank" rel="noopener"><b>hachimi-world-server</b><span>Rust · Axum</span></a>
+          <a class="repo" href="https://github.com/HachimiWorld/hachimi-world-website" target="_blank" rel="noopener"><b>hachimi-world-website</b><span>This website</span></a>
+        </div>
+        <div class="oss-cta">
+          <a class="btn btn-dark" href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener"><i class="fab fa-discord"></i> Discord</a>
+          <a class="btn btn-line" href="https://github.com/HachimiWorld/hachimi-world-client/issues/new/choose" target="_blank" rel="noopener"><i class="fas fa-bug"></i> Report an issue</a>
+          <a class="btn btn-line" href="https://github.com/HachimiWorld/hachimi-world-client/discussions" target="_blank" rel="noopener"><i class="fas fa-comments"></i> Discussions</a>
         </div>
       </div>
     </div>
   </section>
-
 </main>
 
-<footer><div class="wrap"><small>© 2026 Hachimi World · Open Source Project licensed under AGPLv3.</small></div></footer>
+<footer>
+  <div class="wrap foot">
+    <img class="only-light" src="/static/logo-light.svg" alt="Hachimi World">
+    <img class="only-dark" src="/static/logo-dark.svg" alt="Hachimi World">
+    <nav>
+      <a href="https://app.hachimi.world">Web app</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/HachimiWorld" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener">Discord</a>
+      <a href="/">中文</a>
+    </nav>
+    <small>© 2026 Hachimi World · AGPLv3 · A labour of love</small>
+  </div>
+</footer>
 
 </body>
 </html>
