@@ -305,7 +305,7 @@ section { padding: 120px 0 0; }
 /* Screenshot slides: stacked in one grid cell and cross-faded by .shots[data-shot]. */
 .device-desktop, .device-phone { display: grid; }
 .device-desktop > img, .device-phone > img { grid-area: 1 / 1; opacity: 0; transition: opacity .6s ease; }
-.shots[data-shot="0"] .s0, .shots[data-shot="1"] .s1 { opacity: 1; }
+.shots[data-shot="0"] .s0, .shots[data-shot="1"] .s1, .shots[data-shot="2"] .s2 { opacity: 1; }
 
 .shot-tabs { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
 .shot-tab { position: relative; padding: 8px 18px; border-radius: 999px; font-size: 14px; color: var(--text-3); }

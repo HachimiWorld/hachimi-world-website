@@ -302,6 +302,8 @@
       tab.querySelector('i').addEventListener('animationend', () => show((i + 1) % tabs.length))
     })
     new IntersectionObserver(([e]) => root.classList.toggle('offscreen', !e.isIntersecting)).observe(root)
+    // Start on the slide matching the page theme (0 = light, 1 = dark).
+    show(document.documentElement.getAttribute('data-theme') === 'dark' ? 1 : 0)
   }
 
   initTheme()
