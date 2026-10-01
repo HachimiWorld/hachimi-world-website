@@ -110,7 +110,7 @@ section { padding: 120px 0 0; }
 }
 .nav.scrolled { border-bottom-color: var(--line); }
 .nav-in { display: flex; align-items: center; height: 68px; gap: 8px; }
-.brand img { height: 34px; width: auto; }
+.brand img { height: 48px; width: auto; }
 .nav-links { display: flex; gap: 4px; margin-left: 32px; }
 .nav-links a { padding: 8px 14px; border-radius: 999px; font-size: 15px; color: var(--text-2); }
 .nav-links a:hover { color: var(--text); background: var(--surface-2); }
@@ -402,7 +402,7 @@ section { padding: 120px 0 0; }
 /* ---------- footer ---------- */
 footer { padding: 72px 0 48px; color: var(--text-3); font-size: 14px; }
 .foot { display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 28px; }
-.foot img { height: 28px; opacity: .8; }
+.foot img { height: 40px; opacity: .8; }
 .foot nav { display: flex; flex-wrap: wrap; gap: 20px; }
 .foot nav a:hover { color: var(--text); }
 
