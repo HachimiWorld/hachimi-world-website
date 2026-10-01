@@ -2,8 +2,12 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "hachimi-world-website",
   "compatibility_date": "2026-10-01",
+  "main": "worker/index.js",
   "assets": {
-    "directory": "./public"
+    "directory": "./public",
+    "binding": "ASSETS",
+    // Only song pages run the worker (server-side rendering); everything else is served as static files.
+    "run_worker_first": ["/song/*"]
   },
   // Required by `wrangler preview`, which Workers Builds runs for non-production branches.
   "previews": {},

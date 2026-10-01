@@ -2,7 +2,5 @@
 /app      https://app.hachimi.world/  301
 /app/*    https://app.hachimi.world/  301
 
-# Song share links: /song/<id> renders the song page, which reads the id from the path.
-# The target is extensionless because Workers' html_handling redirects *.html to the pretty URL.
+# Song share links: /song/* is rendered by worker/index.js (run_worker_first in wrangler.jsonc).
 /song     /song/  301
-/song/*   /song/song  200

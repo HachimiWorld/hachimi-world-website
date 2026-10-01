@@ -1,4 +1,4 @@
-// Shared behaviour for / and /en/: weekly chart, cover wall, downloads, theme toggle.
+// Homepage behaviour for / and /en/: weekly chart, cover wall, downloads, screenshot slides.
 (() => {
   const API = 'https://api.hachimi.world'
   const WEB_APP = 'https://app.hachimi.world'
@@ -259,28 +259,6 @@
         <span class="v">—</span><span></span></div></li>`
   }
 
-  /* ---------- chrome ---------- */
-  function initTheme() {
-    const meta = document.getElementById('theme-meta')
-    const apply = t => {
-      document.documentElement.setAttribute('data-theme', t)
-      meta.content = t === 'dark' ? '#141210' : '#FBF8F3'
-    }
-    apply(document.documentElement.getAttribute('data-theme'))
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
-      apply(next)
-      try { localStorage.setItem('theme', next) } catch (e) {}
-    })
-  }
-
-  function initNav() {
-    const nav = document.getElementById('nav')
-    const onScroll = () => nav.classList.toggle('scrolled', scrollY > 8)
-    addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-  }
-
   // Screenshot slides in the apps section. The active tab's progress line is a CSS animation;
   // when it ends we advance, so hover/offscreen pausing and reduced motion need no timer logic.
   function initShots() {
@@ -306,8 +284,6 @@
     show(document.documentElement.getAttribute('data-theme') === 'dark' ? 1 : 0)
   }
 
-  initTheme()
-  initNav()
   initShots()
   renderGenres()
   loadSongs().then(songs => {
