@@ -281,8 +281,32 @@
     onScroll()
   }
 
+  // Screenshot slides in the apps section. The active tab's progress line is a CSS animation;
+  // when it ends we advance, so hover/offscreen pausing and reduced motion need no timer logic.
+  function initShots() {
+    const root = document.getElementById('shots')
+    if (!root) return
+    const tabs = [...root.querySelectorAll('.shot-tab')]
+    const show = i => {
+      root.dataset.shot = i
+      tabs.forEach((tab, k) => {
+        tab.setAttribute('aria-selected', String(k === i))
+        const bar = tab.querySelector('i')
+        bar.style.animation = 'none'
+        void bar.offsetWidth // restart the progress animation
+        bar.style.animation = ''
+      })
+    }
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => show(i))
+      tab.querySelector('i').addEventListener('animationend', () => show((i + 1) % tabs.length))
+    })
+    new IntersectionObserver(([e]) => root.classList.toggle('offscreen', !e.isIntersecting)).observe(root)
+  }
+
   initTheme()
   initNav()
+  initShots()
   renderGenres()
   loadSongs().then(songs => {
     if (!songs?.length) return

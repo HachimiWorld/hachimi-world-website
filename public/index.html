@@ -183,13 +183,22 @@
           <li><div class="ico"><i class="fas fa-closed-captioning"></i></div><div><b>歌词与播放页</b><span>滚动歌词，亮色与暗色两种主题。</span></div></li>
         </ul>
       </div>
-      <div class="devices">
-        <div class="device-desktop">
-          <img class="only-light" src="/static/screenshot-desktop-light.webp" alt="基米天堂桌面端首页" width="2400" height="1600" loading="lazy">
-          <img class="only-dark" src="/static/screenshot-desktop-dark.webp" alt="基米天堂桌面端首页" width="2400" height="1600" loading="lazy">
+      <div class="shots" id="shots" data-shot="0">
+        <div class="devices">
+          <div class="device-desktop">
+            <img class="s0 only-light" src="/static/screenshot-desktop-light.webp" alt="基米天堂桌面端首页" width="2400" height="1600" loading="lazy">
+            <img class="s0 only-dark" src="/static/screenshot-desktop-dark.webp" alt="基米天堂桌面端首页" width="2400" height="1600" loading="lazy">
+            <img class="s1" src="/static/screenshot-desktop-player.webp" alt="基米天堂桌面端播放页" width="2400" height="1600" loading="lazy">
+          </div>
+          <div class="device-phone">
+            <img class="s0 only-light" src="/static/screenshot-mobile-light.webp" alt="基米天堂手机端首页" width="1200" height="2670" loading="lazy">
+            <img class="s0 only-dark" src="/static/screenshot-mobile-dark.webp" alt="基米天堂手机端首页" width="1200" height="2670" loading="lazy">
+            <img class="s1" src="/static/screenshot-mobile-player.webp" alt="基米天堂手机端播放页" width="1200" height="2670" loading="lazy">
+          </div>
         </div>
-        <div class="device-phone">
-          <img src="/static/screenshot-mobile-player.webp" alt="基米天堂手机端播放页" width="1200" height="2670" loading="lazy">
+        <div class="shot-tabs" role="tablist" aria-label="截图">
+          <button class="shot-tab" role="tab" aria-selected="true" data-shot="0">首页<i></i></button>
+          <button class="shot-tab" role="tab" aria-selected="false" data-shot="1">播放器<i></i></button>
         </div>
       </div>
     </div>
