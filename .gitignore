@@ -7,3 +7,6 @@
 .wrangler/
 node_modules/
 .dev.vars*
+
+# Local design drafts (contain copies of community cover art)
+drafts/

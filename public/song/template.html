@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<!--
+  Song page template. Not served directly: worker/index.js renders /song/<id> from it,
+  filling every [data-bind] slot and keeping only the [data-show] block for the current state.
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基米天堂 · 歌曲</title>
+
+  <script>
+    (function () {
+      var t = null
+      try { t = localStorage.getItem('theme') } catch (e) {}
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      document.documentElement.setAttribute('data-theme', t)
+    })()
+  </script>
+
+  <meta name="description" content="在基米天堂收听哈基米音乐。">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://hachimi.world/">
+
+  <meta property="og:site_name" content="基米天堂">
+  <meta property="og:type" content="music.song">
+  <meta property="og:title" content="基米天堂 · 歌曲">
+  <meta property="og:description" content="在基米天堂收听哈基米音乐。">
+  <meta property="og:url" content="https://hachimi.world/">
+  <meta property="og:image" content="https://hachimi.world/static/og-image.jpg">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="基米天堂 · 歌曲">
+  <meta name="twitter:description" content="在基米天堂收听哈基米音乐。">
+  <meta name="twitter:image" content="https://hachimi.world/static/og-image.jpg">
+  <script type="application/ld+json" data-bind="jsonld">{}</script>
+
+  <meta name="theme-color" id="theme-meta" content="#FBF8F3">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/site.css">
+  <link rel="stylesheet" href="/static/song.css">
+  <script src="/static/base.js" defer></script>
+  <script src="/static/song.js" defer></script>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/" aria-label="基米天堂">
+      <img class="only-light" src="/static/logo-light.svg" alt="基米天堂">
+      <img class="only-dark" src="/static/logo-dark.svg" alt="基米天堂">
+    </a>
+    <div class="nav-right">
+      <button class="icon-btn" id="theme-toggle" aria-label="切换亮色/暗色">
+        <i class="fas fa-moon only-light"></i><i class="fas fa-sun only-dark"></i>
+      </button>
+      <a class="icon-btn" href="https://github.com/HachimiWorld" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+      <a class="btn btn-ghost btn-sm" href="https://app.hachimi.world">网页版</a>
+    </div>
+  </div>
+</header>
+
+<main class="song">
+  <div class="song-backdrop" aria-hidden="true" data-show="ok"><img data-bind="backdrop" alt=""></div>
+
+  <section class="wrap song-hero" data-show="ok">
+    <div class="song-cover"><img data-bind="cover" alt="" width="600" height="600"></div>
+    <div class="song-meta">
+      <span class="label" data-bind="jmid">JM</span>
+      <h1 class="song-title" data-bind="title">歌曲</h1>
+      <p class="song-subtitle" data-bind="subtitle"></p>
+      <p class="song-by" data-bind="uploader"></p>
+      <div class="tags" data-bind="tags"></div>
+      <div class="song-stats" data-bind="stats"></div>
+
+      <div class="preview" id="preview" data-bind="preview">
+        <button class="preview-btn" type="button" aria-label="试听"><i class="fas fa-play"></i><i class="fas fa-pause"></i></button>
+        <div class="preview-track" aria-hidden="true"><div class="preview-bar"></div></div>
+        <span class="preview-time">00:00 / 01:00</span>
+      </div>
+      <p class="preview-note" data-bind="preview-note">试听前 60 秒，完整版请在网页版或客户端收听。</p>
+
+      <div class="song-cta">
+        <a class="btn btn-accent" data-bind="web-link" href="https://app.hachimi.world"><i class="fas fa-play"></i> 在网页版收听</a>
+        <a class="btn btn-ghost" href="/#download">下载客户端</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap song-body" data-show="ok">
+    <div class="song-lyrics">
+      <h2 class="song-h">歌词</h2>
+      <div class="lyrics" id="lyrics" data-bind="lyrics"></div>
+    </div>
+    <aside class="song-details" data-bind="details"></aside>
+  </section>
+
+  <section class="wrap song-empty" data-show="missing">
+    <span class="label">404</span>
+    <h1 class="song-title">没有找到这首歌</h1>
+    <p class="lead">它可能已被删除，或者链接有误。</p>
+    <a class="btn btn-accent" href="/">返回首页</a>
+  </section>
+
+  <section class="wrap song-empty" data-show="error">
+    <span class="label">502</span>
+    <h1 class="song-title">暂时无法加载</h1>
+    <p class="lead">服务暂时不可用，请稍后刷新重试。</p>
+    <a class="btn btn-accent" href="/">返回首页</a>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <img class="only-light" src="/static/logo-light.svg" alt="基米天堂">
+    <img class="only-dark" src="/static/logo-dark.svg" alt="基米天堂">
+    <nav>
+      <a href="https://app.hachimi.world">网页版</a>
+      <a href="/#download">下载</a>
+      <a href="https://github.com/HachimiWorld" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener">Discord</a>
+    </nav>
+    <small>© 2026 基米天堂 · AGPLv3 · 为爱发电</small>
+  </div>
+</footer>
+</body>
+</html>
