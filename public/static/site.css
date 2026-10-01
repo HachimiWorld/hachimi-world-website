@@ -120,7 +120,10 @@ section { padding: 120px 0 0; }
 @media (max-width: 480px) { .nav .btn-open-web { display: none; } }
 
 /* ---------- hero ---------- */
-.hero { padding: 48px 0 0; position: relative; }
+/* The rotated cover wall bleeds past the viewport; clip it here, otherwise mobile
+   browsers zoom the whole page out to fit it (body overflow-x alone doesn't stop that). */
+.hero { padding: 48px 0 0; position: relative; overflow: hidden; }
+@supports (overflow: clip) { .hero { overflow: visible; overflow-x: clip; } }
 .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; }
 .kicker { font-size: 13px; color: var(--text-3); letter-spacing: .12em; }
 @media (max-width: 640px) { .kicker { letter-spacing: .04em; } }
