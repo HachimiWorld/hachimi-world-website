@@ -5,6 +5,9 @@
   --accent-soft: rgba(255, 120, 47, 0.12);
   --accent-ink: #C24E14;
   --on-accent: #1D1208;
+  /* Solid orange fills that carry white text (buttons, chips): a slightly deeper orange keeps white legible. */
+  --accent-fill: #F0621A;
+  --on-accent-fill: #FFFFFF;
 
   --bg: #FBF8F3;
   --bg-2: #F3EDE4;
@@ -72,8 +75,8 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
 }
 .btn:active { transform: scale(.97); }
-.btn-accent { background: var(--accent); color: var(--on-accent); box-shadow: 0 8px 24px rgba(255, 120, 47, .35); }
-.btn-accent:hover { background: #FF8A47; }
+.btn-accent { background: var(--accent-fill); color: var(--on-accent-fill); box-shadow: 0 8px 24px rgba(240, 98, 26, .35); }
+.btn-accent:hover { background: #E0561A; }
 .btn-ghost { background: var(--surface); border: 1px solid var(--line); }
 .btn-ghost:hover { background: var(--surface-2); }
 .btn-sm { height: 40px; padding: 0 16px; font-size: 14px; }
@@ -266,7 +269,7 @@ section { padding: 120px 0 0; }
   flex: none; padding: 12px 22px; border-radius: 999px; font-size: 18px; font-weight: 600;
   background: var(--surface); border: 1px solid var(--line); color: var(--text-2);
 }
-.chip.hot { background: var(--accent); border-color: transparent; color: var(--on-accent); }
+.chip.hot { background: var(--accent-fill); border-color: transparent; color: var(--on-accent-fill); }
 .chip.ink { background: var(--text); border-color: transparent; color: var(--bg); }
 
 /* ---------- voices ---------- */
