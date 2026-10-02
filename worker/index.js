@@ -1,10 +1,14 @@
-// Server-side rendering for song share pages (/song/<JM-ID>).
-// Only /song/* reaches this script (see run_worker_first in wrangler.jsonc); everything else
-// is served straight from static assets.
+// Server-side rendering for song share pages (/song/<JM-ID>), plus the sitemaps.
+// Only /song/* and the sitemap paths reach this script (see run_worker_first in wrangler.jsonc);
+// everything else is served straight from static assets.
 
 const API = 'https://api.hachimi.world'
 const SITE = 'https://hachimi.world'
 const WEB_APP = 'https://app.hachimi.world'
+// The server uploads sitemaps here daily (hachimi-world-server src/service/sitemap.rs), under a
+// secret directory that only the server config and Search Console know.
+const SITEMAP_STORAGE = 'https://storage.hachimi.world/sitemap'
+const SITEMAP_PATH = /^\/sitemap\/[A-Za-z0-9_-]{16,}\/[a-z0-9-]+\.xml$/
 const DEFAULT_IMAGE = `${SITE}/static/og-image.jpg`
 const ID_PATTERN = /^JM-[A-Z0-9]+-\d+$/
 
@@ -15,8 +19,25 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url)
     if (url.pathname.startsWith('/song/')) return renderSong(env, url)
+    if (url.pathname.startsWith('/sitemap/')) return serveSitemap(url.pathname)
     return env.ASSETS.fetch(request)
   },
+}
+
+// Proxy from storage so the sitemaps live on the same host as the URLs they list.
+async function serveSitemap(path) {
+  if (!SITEMAP_PATH.test(path)) return new Response('Not found', { status: 404 })
+  const resp = await fetch(`${SITEMAP_STORAGE}/${path.slice('/sitemap/'.length)}`, { cf: { cacheTtl: 3600, cacheEverything: true } })
+  if (!resp.ok) {
+    const status = resp.status === 404 ? 404 : 502
+    return new Response(status === 404 ? 'Not found' : 'Bad gateway', { status, headers: { 'cache-control': 'no-store' } })
+  }
+  return new Response(resp.body, {
+    headers: {
+      'content-type': 'application/xml; charset=utf-8',
+      'cache-control': 'public, max-age=3600',
+    },
+  })
 }
 
 async function renderSong(env, url) {
