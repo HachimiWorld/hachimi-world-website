@@ -65,7 +65,7 @@
     { key: 'ios', name: 'iOS', icon: 'fab fa-apple' },
   ]
 
-  const SONG_PAGE = id => `/song/${encodeURIComponent(id)}`
+  const SONG_PAGE = id => `/song/${encodeURIComponent(String(id).toLowerCase())}`
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
   const shortVer = v => String(v || '').split('-')[0]
   const fmtCount = n => {

@@ -45,9 +45,11 @@ async function renderSong(env, url) {
   const queryId = url.searchParams.get('id')
   const id = (segment || queryId || '').trim().toUpperCase()
 
-  // Old share links used /song/?id=JM-...; give them the canonical path.
-  if (!segment && queryId && ID_PATTERN.test(id)) {
-    return Response.redirect(`${url.origin}/song/${id}`, 301)
+  // Song URLs are lowercase, as the app shares them. Old /song/?id=JM-... links and other
+  // casings get a permanent redirect there.
+  if (ID_PATTERN.test(id) && segment !== id.toLowerCase()) {
+    const search = segment ? url.search : ''
+    return Response.redirect(`${url.origin}/song/${id.toLowerCase()}${search}`, 301)
   }
 
   let state = 'missing'
@@ -101,7 +103,7 @@ function emptyRewriter(state) {
 }
 
 function songRewriter(song) {
-  const canonical = `${SITE}/song/${song.display_id}`
+  const canonical = `${SITE}/song/${song.display_id.toLowerCase()}`
   const title = [song.title, song.uploader_name, '基米天堂'].filter(Boolean).join(' · ')
   const description = describe(song)
   const image = song.cover_url || DEFAULT_IMAGE
