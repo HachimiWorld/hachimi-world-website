@@ -124,18 +124,12 @@
     return 'web'
   }
 
-  // Changelog lines look like "1. Support following users. 支持关注用户。"; keep the half matching the page language.
+  // Changelog lines look like "1. Support following users. 支持关注用户。"; items of every section, shown as written.
   function parseChanges(changelog) {
     const out = []
-    let inFeatures = false
     for (const line of String(changelog || '').split('\n')) {
-      if (line.startsWith('## ')) { inFeatures = /Features/i.test(line); continue }
-      if (!inFeatures || !/^\d+\./.test(line)) continue
-      const body = line.replace(/^\d+\.\s*/, '')
-      const cjk = body.search(/[一-龥]/)
-      const text = LANG === 'zh'
-        ? (cjk >= 0 ? body.slice(cjk) : body).replace(/。$/, '')
-        : (cjk > 0 ? body.slice(0, cjk) : body).trim().replace(/\.$/, '')
+      if (!/^\d+\./.test(line)) continue
+      const text = line.replace(/^\d+\.\s*/, '').trim()
       if (text) out.push(text)
     }
     return out.slice(0, 4)
