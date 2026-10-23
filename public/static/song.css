@@ -63,6 +63,11 @@
 .detail-links i { font-size: 11px; color: var(--text-3); }
 .muted { color: var(--text-3); }
 
+/* ---------- more songs ---------- */
+.song-more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; padding-top: 96px; }
+.song-more .list { margin: 12px -12px 0; }
+.row-plain { grid-template-columns: 52px minmax(0, 1fr) auto; }
+
 /* ---------- not found / error ---------- */
 .song-empty { padding: 120px 24px 40px; min-height: 50vh; }
 .song-empty .btn { margin-top: 32px; }
@@ -71,6 +76,7 @@
   .song-hero { grid-template-columns: 1fr; gap: 32px; padding-top: 32px; }
   .song-cover { max-width: 320px; }
   .song-body { grid-template-columns: 1fr; gap: 48px; padding-top: 72px; }
+  .song-more { grid-template-columns: 1fr; gap: 48px; padding-top: 72px; }
   .lyrics[data-synced] { max-height: 440px; }
 }
 @media (max-width: 640px) {
