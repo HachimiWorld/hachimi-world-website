@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!--
+  Opened from the link in the email sent to the old address when an account's email changes:
+  /account/revert-email?token=<token>. Puts the old email back, sets a new password and logs out every
+  device, through POST /auth/email/revert_change. The server sets the link with
+  `account.email_change_revert_url`.
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基米天堂 · 改回邮箱</title>
+  <meta name="robots" content="noindex,nofollow">
+  <!-- The token is in the URL: don't send it anywhere -->
+  <meta name="referrer" content="no-referrer">
+
+  <script>
+    (function () {
+      var t = null
+      try { t = localStorage.getItem('theme') } catch (e) {}
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      document.documentElement.setAttribute('data-theme', t)
+    })()
+  </script>
+
+  <meta name="theme-color" id="theme-meta" content="#FBF8F3">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/site.css">
+  <link rel="stylesheet" href="/static/account.css">
+  <script src="/static/base.js" defer></script>
+  <script src="/static/revert-email.js" defer></script>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/" aria-label="基米天堂">
+      <img class="only-light" src="/static/logo-light.svg" alt="基米天堂">
+      <img class="only-dark" src="/static/logo-dark.svg" alt="基米天堂">
+    </a>
+    <div class="nav-right">
+      <button class="icon-btn" id="theme-toggle" aria-label="切换亮色/暗色">
+        <i class="fas fa-moon only-light"></i><i class="fas fa-sun only-dark"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap account">
+  <section class="account-card" data-state="form">
+    <span class="label" data-i18n="label">账号安全</span>
+    <h1 class="account-title" data-i18n="title">改回原来的邮箱</h1>
+    <p class="account-text" data-i18n="intro">提交后，账号的绑定邮箱会改回收到这封邮件的邮箱，正在等待的更换也会取消。更换邮箱的人可能知道你的密码，所以请设置一个新密码。所有设备都会退出登录。</p>
+
+    <form id="form" novalidate>
+      <label class="field">
+        <span data-i18n="password">新密码</span>
+        <input id="password" type="password" autocomplete="new-password" minlength="8" required>
+      </label>
+      <label class="field">
+        <span data-i18n="repeat">再输一次新密码</span>
+        <input id="repeat" type="password" autocomplete="new-password" minlength="8" required>
+      </label>
+      <p class="account-error" id="error" role="alert" hidden></p>
+      <button class="btn btn-accent account-submit" id="submit" type="submit" data-i18n="submit">改回邮箱并设置新密码</button>
+    </form>
+  </section>
+
+  <section class="account-card" data-state="done" hidden>
+    <span class="label" data-i18n="label">账号安全</span>
+    <h1 class="account-title" data-i18n="doneTitle">已改回</h1>
+    <p class="account-text" data-i18n="doneText">账号邮箱已改回原来的邮箱，所有设备都已退出登录。请用新密码重新登录。</p>
+    <a class="btn btn-accent account-submit" href="https://app.hachimi.world" data-i18n="openApp">打开网页版登录</a>
+  </section>
+
+  <section class="account-card" data-state="invalid" hidden>
+    <span class="label" data-i18n="label">账号安全</span>
+    <h1 class="account-title" data-i18n="invalidTitle">链接无效</h1>
+    <p class="account-text" data-i18n="invalidText">这个链接无效、已经用过或者已经过期。如果你的账号仍然有问题，请联系我们。</p>
+    <a class="btn btn-ghost account-submit" href="/" data-i18n="home">返回首页</a>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <img class="only-light" src="/static/logo-light.svg" alt="基米天堂">
+    <img class="only-dark" src="/static/logo-dark.svg" alt="基米天堂">
+    <nav>
+      <a href="https://app.hachimi.world" data-i18n="web">网页版</a>
+      <a href="https://github.com/HachimiWorld" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener">Discord</a>
+    </nav>
+    <small>© 2026 基米天堂 · AGPLv3 · 为爱发电</small>
+  </div>
+</footer>
+</body>
+</html>
