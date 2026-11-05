@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Opened from the link in the email sent to the old address when an account's email changes:
+  Opened from the link in the emails sent to the old address when an account's email changes:
   /account/revert-email?token=<token>. Puts the old email back, sets a new password and logs out every
   device, through POST /auth/email/revert_change. The server sets the link with
   `account.email_change_revert_url`.
@@ -9,7 +9,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>基米天堂 · 改回邮箱</title>
+  <title>基米天堂 · 撤销邮箱更换</title>
   <meta name="robots" content="noindex,nofollow">
   <!-- The token is in the URL: don't send it anywhere -->
   <meta name="referrer" content="no-referrer">
@@ -50,8 +50,8 @@
 <main class="wrap account">
   <section class="account-card" data-state="form">
     <span class="label" data-i18n="label">账号安全</span>
-    <h1 class="account-title" data-i18n="title">改回原来的邮箱</h1>
-    <p class="account-text" data-i18n="intro">提交后，账号的绑定邮箱会改回收到这封邮件的邮箱，正在等待的更换也会取消。更换邮箱的人可能知道你的密码，所以请设置一个新密码。所有设备都会退出登录。</p>
+    <h1 class="account-title" data-i18n="title">撤销邮箱更换</h1>
+    <p class="account-text" data-i18n="intro">提交后将撤销此次邮箱更换，绑定邮箱改回原邮箱，所有设备都将退出登录。发起更换的人可能知道你的密码，因此请同时设置新密码。</p>
 
     <form id="form" novalidate>
       <label class="field">
@@ -59,25 +59,25 @@
         <input id="password" type="password" autocomplete="new-password" minlength="8" required>
       </label>
       <label class="field">
-        <span data-i18n="repeat">再输一次新密码</span>
+        <span data-i18n="repeat">确认新密码</span>
         <input id="repeat" type="password" autocomplete="new-password" minlength="8" required>
       </label>
       <p class="account-error" id="error" role="alert" hidden></p>
-      <button class="btn btn-accent account-submit" id="submit" type="submit" data-i18n="submit">改回邮箱并设置新密码</button>
+      <button class="btn btn-accent account-submit" id="submit" type="submit" data-i18n="submit">撤销更换并设置新密码</button>
     </form>
   </section>
 
   <section class="account-card" data-state="done" hidden>
     <span class="label" data-i18n="label">账号安全</span>
-    <h1 class="account-title" data-i18n="doneTitle">已改回</h1>
-    <p class="account-text" data-i18n="doneText">账号邮箱已改回原来的邮箱，所有设备都已退出登录。请用新密码重新登录。</p>
-    <a class="btn btn-accent account-submit" href="https://app.hachimi.world" data-i18n="openApp">打开网页版登录</a>
+    <h1 class="account-title" data-i18n="doneTitle">已撤销更换</h1>
+    <p class="account-text" data-i18n="doneText">绑定邮箱已改回原邮箱，所有设备均已退出登录。请使用新密码重新登录。</p>
+    <a class="btn btn-accent account-submit" href="https://app.hachimi.world" data-i18n="openApp">前往网页版登录</a>
   </section>
 
   <section class="account-card" data-state="invalid" hidden>
     <span class="label" data-i18n="label">账号安全</span>
     <h1 class="account-title" data-i18n="invalidTitle">链接无效</h1>
-    <p class="account-text" data-i18n="invalidText">这个链接无效、已经用过或者已经过期。如果你的账号仍然有问题，请联系我们。</p>
+    <p class="account-text" data-i18n="invalidText">此链接无效、已使用或已过期。如果账号仍有异常，请联系我们。</p>
     <a class="btn btn-ghost account-submit" href="/" data-i18n="home">返回首页</a>
   </section>
 </main>

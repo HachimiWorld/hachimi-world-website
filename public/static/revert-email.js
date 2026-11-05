@@ -1,4 +1,4 @@
-// /account/revert-email?token=<token>: puts the old email back on the account and sets a new password.
+// /account/revert-email?token=<token>: undoes an email change and sets a new password.
 (() => {
   const API = 'https://api.hachimi.world'
   const MIN_PASSWORD = 8 // The server's minimum
@@ -6,22 +6,22 @@
 
   const T = {
     zh: {
-      tooShort: `密码至少要 ${MIN_PASSWORD} 位`,
-      notMatch: '两次输入的密码不一样',
-      submitting: '正在提交…',
-      oldEmailTaken: '原来的邮箱已被其他账号使用，请联系我们',
+      tooShort: `密码至少需要 ${MIN_PASSWORD} 位`,
+      notMatch: '两次输入的密码不一致',
+      submitting: '正在提交……',
+      oldEmailTaken: '原邮箱已被其他账号使用，无法改回。请联系我们',
       failed: '提交失败，请稍后重试',
     },
     en: {
-      title: 'Change back to your email',
+      title: 'Undo email change',
       label: 'Account security',
-      intro: 'This puts the email that got this message back on the account, and cancels a change that is still waiting. Whoever changed it may know your password, so set a new one. Every device will be logged out.',
+      intro: 'This undoes the email change and puts back your original email. Every device will be logged out. Whoever made the change may know your password, so set a new one as well.',
       password: 'New password',
-      repeat: 'New password again',
-      submit: 'Change back and set the password',
-      doneTitle: 'Changed back',
-      doneText: 'Your account email is back, and every device has been logged out. Log in again with your new password.',
-      openApp: 'Open the web app to log in',
+      repeat: 'Confirm new password',
+      submit: 'Undo and set new password',
+      doneTitle: 'Change undone',
+      doneText: 'Your account email is back to the original one, and every device has been logged out. Log in again with your new password.',
+      openApp: 'Go to the web app to log in',
       invalidTitle: 'Invalid link',
       invalidText: 'This link is invalid, used or expired. If something is still wrong with your account, please contact us.',
       home: 'Back to home',
@@ -29,7 +29,7 @@
       tooShort: `Use at least ${MIN_PASSWORD} characters`,
       notMatch: "The passwords don't match",
       submitting: 'Submitting…',
-      oldEmailTaken: 'Your email is used by another account now. Please contact us',
+      oldEmailTaken: 'Your original email is now used by another account and cannot be restored. Please contact us',
       failed: 'Something went wrong. Please try again later',
     },
   }
