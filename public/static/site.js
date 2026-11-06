@@ -15,6 +15,8 @@
       otherPlatforms: '其他平台',
       released: date => `${date} 发布`,
       changes: v => `${v} 更新内容`,
+      copy: '复制',
+      copied: '已复制',
       noInstall: '无需安装',
       iosHint: 'iOS 安装包需自签名',
       web: '网页版',
@@ -40,6 +42,8 @@
       otherPlatforms: 'Other platforms',
       released: date => `Released ${date}`,
       changes: v => `What's new in ${v}`,
+      copy: 'Copy',
+      copied: 'Copied',
       noInstall: 'No installation needed',
       iosHint: 'The iOS package requires self-signing',
       web: 'Web',
@@ -199,6 +203,26 @@
     document.getElementById('mq2').innerHTML = chips(b, 2) + chips(b, 2)
   }
 
+  // SHA-256 of the package, shortened, with a button that copies all of it. Older versions have none.
+  function checksum(sha256) {
+    if (!sha256) return ''
+    return `<div class="sum"><span>SHA-256</span>
+      <code title="${esc(sha256)}">${esc(sha256.slice(0, 8))}…${esc(sha256.slice(-8))}</code>
+      <button type="button" data-copy="${esc(sha256)}">${T.copy}</button></div>`
+  }
+
+  document.addEventListener('click', async e => {
+    const btn = e.target.closest('button[data-copy]')
+    if (!btn) return
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copy)
+    } catch {
+      return
+    }
+    btn.textContent = T.copied
+    setTimeout(() => { btn.textContent = T.copy }, 1500)
+  })
+
   function renderDownloads(versions) {
     const byKey = Object.fromEntries(versions.map(v => [v.variant.replace('release-', ''), v]))
     const detected = detectPlatform()
@@ -226,6 +250,7 @@
         <h3>${esc(T.appFor(p.name))}</h3>
         <a class="btn btn-accent" href="${esc(v.url)}"><i class="fas fa-download"></i> ${esc(T.downloadVer(shortVer(v.version_name)))}</a>
         <div class="ver" title="${esc(v.version_name)}">${esc(T.notes[p.key])} · ${esc(T.released(date))}</div>
+        ${checksum(v.sha256)}
         ${changesHtml}`
 
       const heroBtn = document.getElementById('hero-dl')

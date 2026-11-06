@@ -341,6 +341,14 @@ section { padding: 120px 0 0; }
 .dl-main h3 { margin: 0; font-size: 32px; line-height: 1.2; letter-spacing: -0.02em; }
 .dl-main .ver { font-size: 13px; opacity: .6; }
 .dl-main .btn-accent { align-self: flex-start; box-shadow: none; }
+.dl-main .sum { display: flex; align-items: center; gap: 10px; font-size: 13px; margin-top: -10px; }
+.dl-main .sum span { opacity: .6; }
+.dl-main .sum code { font-family: var(--mono); opacity: .8; }
+.dl-main .sum button {
+  font: inherit; color: inherit; background: none; cursor: pointer;
+  border: 1px solid rgba(244, 239, 233, .24); border-radius: 999px; padding: 2px 10px;
+}
+.dl-main .sum button:hover { background: rgba(244, 239, 233, .08); }
 .changes { border-top: 1px solid rgba(244, 239, 233, .14); padding-top: 20px; }
 .changes b { font-size: 14px; opacity: .7; font-weight: 600; }
 .changes ul { margin: 10px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 15px; }
