@@ -15,6 +15,8 @@
       otherPlatforms: '其他平台',
       released: date => `${date} 发布`,
       changes: v => `${v} 更新内容`,
+      copy: '复制',
+      copied: '已复制',
       noInstall: '无需安装',
       iosHint: 'iOS 安装包需自签名',
       web: '网页版',
@@ -40,6 +42,8 @@
       otherPlatforms: 'Other platforms',
       released: date => `Released ${date}`,
       changes: v => `What's new in ${v}`,
+      copy: 'Copy',
+      copied: 'Copied',
       noInstall: 'No installation needed',
       iosHint: 'The iOS package requires self-signing',
       web: 'Web',
@@ -199,58 +203,122 @@
     document.getElementById('mq2').innerHTML = chips(b, 2) + chips(b, 2)
   }
 
+  // SHA-256 of the package, shortened, with a button that copies all of it. Older versions have none.
+  function checksum(sha256) {
+    if (!sha256) return ''
+    return `<div class="sum"><span>SHA-256</span>
+      <code title="${esc(sha256)}">${esc(sha256.slice(0, 8))}…${esc(sha256.slice(-8))}</code>
+      <button type="button" data-copy="${esc(sha256)}">${T.copy}</button></div>`
+  }
+
+  document.addEventListener('click', async e => {
+    const btn = e.target.closest('button[data-copy]')
+    if (!btn) return
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copy)
+    } catch {
+      return
+    }
+    btn.textContent = T.copied
+    setTimeout(() => { btn.textContent = T.copy }, 1500)
+  })
+
   function renderDownloads(versions) {
     const byKey = Object.fromEntries(versions.map(v => [v.variant.replace('release-', ''), v]))
     const detected = detectPlatform()
     // The iOS build needs self-signing, so iPhone/iPad visitors are pointed at the web app first.
-    const mainKey = (detected === 'ios' || detected === 'web' || !byKey[detected]) ? 'web' : detected
-    const latest = byKey[mainKey] || byKey.windows
-    const changes = parseChanges(latest?.changelog)
-    const changesHtml = changes.length ? `
-      <div class="changes"><b>${esc(T.changes(shortVer(latest.version_name)))}</b>
-        <ul>${changes.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>` : ''
-
+    const startKey = (detected === 'ios' || detected === 'web' || !byKey[detected]) ? 'web' : detected
     const main = document.getElementById('dl-main')
-    if (mainKey === 'web') {
-      main.innerHTML = `
-        <div class="os"><i class="fas fa-globe"></i><span>${detected === 'ios' ? T.iosHint : T.noInstall}</span></div>
-        <h3>${T.web}</h3>
-        <a class="btn btn-accent" href="${WEB_APP}"><i class="fas fa-arrow-up-right-from-square"></i> ${T.openWeb}</a>
-        ${changesHtml}`
-    } else {
-      const p = PLATFORMS.find(p => p.key === mainKey)
-      const v = byKey[mainKey]
-      const date = new Date(v.release_time).toLocaleDateString(T.locale, { year: 'numeric', month: 'long', day: 'numeric' })
-      main.innerHTML = `
-        <div class="os"><i class="${p.icon}"></i><span>${esc(T.currentOs(p.name))}</span></div>
-        <h3>${esc(T.appFor(p.name))}</h3>
-        <a class="btn btn-accent" href="${esc(v.url)}"><i class="fas fa-download"></i> ${esc(T.downloadVer(shortVer(v.version_name)))}</a>
-        <div class="ver" title="${esc(v.version_name)}">${esc(T.notes[p.key])} · ${esc(T.released(date))}</div>
-        ${changesHtml}`
+    const list = document.getElementById('platforms')
 
+    // The hero button always points at the visitor's own system
+    if (startKey !== 'web') {
+      const p = PLATFORMS.find(p => p.key === startKey)
+      const v = byKey[startKey]
       const heroBtn = document.getElementById('hero-dl')
       heroBtn.href = v.url
       heroBtn.querySelector('span').textContent = T.heroDownload(p.name)
       document.getElementById('hero-note').innerHTML = `v${esc(shortVer(v.version_name))} · <a href="#download">${T.otherPlatforms}</a>`
     }
 
-    const rows = PLATFORMS.filter(p => byKey[p.key]).map(p => {
+    // The card on the left shows the platform picked in the list, starting with the visitor's own
+    function renderMain(key) {
+      const latest = byKey[key] || byKey.windows
+      const changes = parseChanges(latest?.changelog)
+      const changesHtml = changes.length ? `
+        <div class="changes"><b>${esc(T.changes(shortVer(latest.version_name)))}</b>
+          <ul>${changes.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>` : ''
+
+      if (key === 'web') {
+        main.innerHTML = `
+          <div class="os"><i class="fas fa-globe"></i><span>${detected === 'ios' ? T.iosHint : T.noInstall}</span></div>
+          <h3>${T.web}</h3>
+          <a class="btn btn-accent" href="${WEB_APP}"><i class="fas fa-arrow-up-right-from-square"></i> ${T.openWeb}</a>
+          ${changesHtml}`
+        return
+      }
+      const p = PLATFORMS.find(p => p.key === key)
+      const v = byKey[key]
+      const date = new Date(v.release_time).toLocaleDateString(T.locale, { year: 'numeric', month: 'long', day: 'numeric' })
+      main.innerHTML = `
+        <div class="os"><i class="${p.icon}"></i><span>${esc(key === detected ? T.currentOs(p.name) : p.name)}</span></div>
+        <h3>${esc(T.appFor(p.name))}</h3>
+        <a class="btn btn-accent" href="${esc(v.url)}"><i class="fas fa-download"></i> ${esc(T.downloadVer(shortVer(v.version_name)))}</a>
+        <div class="ver" title="${esc(v.version_name)}">${esc(T.notes[p.key])} · ${esc(T.released(date))}</div>
+        ${checksum(v.sha256)}
+        ${changesHtml}`
+    }
+
+    function select(key) {
+      renderMain(key)
+      list.querySelectorAll('.row').forEach(row => {
+        const on = row.dataset.key === key
+        row.classList.toggle('current', on)
+        row.setAttribute('aria-pressed', String(on))
+      })
+    }
+
+    // A row picks the platform; the icon at its end downloads straight away
+    const row = (key, icon, name, note, version, href, goIcon, goLabel) => `
+      <li><div class="row" role="button" tabindex="0" aria-pressed="false" data-key="${key}">
+        <i class="p ${icon}"></i>
+        <div><div class="name">${name}</div><div class="note">${note}</div></div>
+        ${version}
+        <a class="go" href="${esc(href)}" title="${esc(goLabel)}" aria-label="${esc(goLabel)}"><i class="${goIcon}"></i></a></div></li>`
+
+    list.innerHTML = PLATFORMS.filter(p => byKey[p.key]).map(p => {
       const v = byKey[p.key]
-      return `<li><a href="${esc(v.url)}" class="${p.key === mainKey ? 'current' : ''}">
-        <i class="p ${p.icon}"></i>
-        <div><div class="name">${p.name}</div><div class="note">${esc(T.notes[p.key])}</div></div>
-        <span class="v" title="${esc(v.version_name)}">${esc(shortVer(v.version_name))}</span>
-        <i class="go fas fa-download"></i></a></li>`
-    }).join('')
-    document.getElementById('platforms').innerHTML = rows + `
-      <li><a href="${WEB_APP}" class="${mainKey === 'web' ? 'current' : ''}">
-        <i class="p fas fa-globe"></i>
-        <div><div class="name">${T.web}</div><div class="note">${T.webNote}</div></div>
-        <span class="v url">app.hachimi.world</span><i class="go fas fa-arrow-up-right-from-square"></i></a></li>
+      return row(p.key, p.icon, p.name, esc(T.notes[p.key]),
+        `<span class="v" title="${esc(v.version_name)}">${esc(shortVer(v.version_name))}</span>`,
+        v.url, 'fas fa-download', `${p.name} · ${T.downloadVer(shortVer(v.version_name))}`)
+    }).join('') +
+      row('web', 'fas fa-globe', T.web, T.webNote, '<span class="v url">app.hachimi.world</span>',
+        WEB_APP, 'fas fa-arrow-up-right-from-square', T.openWeb) + `
       <li><div class="soon">
         <i class="p fas fa-mobile-screen"></i>
         <div><div class="name">HarmonyOS</div><div class="note">${T.harmonyNote}</div></div>
         <span class="v">—</span><span></span></div></li>`
+
+    function pick(target) {
+      const r = target.closest('.row')
+      if (!r) return
+      select(r.dataset.key)
+      // On narrow screens the card is above the list, out of sight
+      const top = main.getBoundingClientRect().top
+      if (top < 0 || top > window.innerHeight * 0.6) main.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+    list.addEventListener('click', e => {
+      if (e.target.closest('a.go')) return
+      pick(e.target)
+    })
+    list.addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('row')) {
+        e.preventDefault()
+        pick(e.target)
+      }
+    })
+
+    select(startKey)
   }
 
   // Screenshot slides in the apps section. The active tab's progress line is a CSS animation;
