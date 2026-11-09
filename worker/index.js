@@ -11,6 +11,7 @@ const SITEMAP_STORAGE = 'https://storage.hachimi.world/sitemap'
 const SITEMAP_PATH = /^\/sitemap\/[A-Za-z0-9_-]{16,}\/[a-z0-9-]+\.xml$/
 const DEFAULT_IMAGE = `${SITE}/static/og-image.jpg`
 const ID_PATTERN = /^JM-[A-Z0-9]+-\d+$/
+const MORE_LIMIT = 8
 
 const CREATION_TYPES = ['原创', '二创', '三创']
 const PLATFORMS = { bilibili: '哔哩哔哩', douyin: '抖音', youtube: 'YouTube', netease: '网易云音乐', qqmusic: 'QQ 音乐', niconico: 'niconico' }
@@ -71,8 +72,11 @@ async function renderSong(env, url) {
     }
   }
 
+  // Links to other song pages, so crawlers can reach songs from here and not only from the sitemap
+  const more = state === 'ok' ? await loadMore(song) : null
+
   const template = await env.ASSETS.fetch(new URL('/song/template', url))
-  const rewriter = state === 'ok' ? songRewriter(song) : emptyRewriter(state)
+  const rewriter = state === 'ok' ? songRewriter(song, more) : emptyRewriter(state)
   rewriter.on('[data-show]', {
     element(el) {
       if (el.getAttribute('data-show') !== state) el.remove()
@@ -91,6 +95,26 @@ async function renderSong(env, url) {
   })
 }
 
+// The uploader's other songs and this week's hot songs, minus this one. A failed request only
+// leaves its list empty.
+async function loadMore(song) {
+  const get = async (path, ttl) => {
+    try {
+      const resp = await fetch(`${API}${path}`, { cf: { cacheTtl: ttl, cacheEverything: true } })
+      const body = await resp.json()
+      return body.ok ? body.data.songs : []
+    } catch {
+      return []
+    }
+  }
+  const [byUploader, hot] = await Promise.all([
+    song.uploader_uid != null ? get(`/song/page_by_user?user_id=${song.uploader_uid}&size=${MORE_LIMIT + 1}`, 300) : [],
+    get('/song/hot/weekly', 3600),
+  ])
+  const others = list => list.filter(s => s.display_id !== song.display_id).slice(0, MORE_LIMIT)
+  return { byUploader: others(byUploader), hot: others(hot) }
+}
+
 /* ---------- rewriters ---------- */
 
 function emptyRewriter(state) {
@@ -102,7 +126,7 @@ function emptyRewriter(state) {
     .on('[data-bind="jsonld"]', { element: el => el.remove() })
 }
 
-function songRewriter(song) {
+function songRewriter(song, more) {
   const canonical = `${SITE}/song/${song.display_id.toLowerCase()}`
   const title = [song.title, song.uploader_name, '基米天堂'].filter(Boolean).join(' · ')
   const description = describe(song)
@@ -149,6 +173,7 @@ function songRewriter(song) {
       },
     })
     .on('[data-bind="details"]', html(details(song)))
+    .on('[data-bind="more"]', more.byUploader.length || more.hot.length ? html(moreLists(song, more)) : remove())
 }
 
 /* ---------- content ---------- */
@@ -185,6 +210,20 @@ function details(song) {
 
   if (song.description) blocks.push(detail('简介', esc(song.description).replace(/\n/g, '<br>')))
   return blocks.join('')
+}
+
+function moreLists(song, more) {
+  const blocks = []
+  if (more.byUploader.length) blocks.push(moreList(`${esc(song.uploader_name || 'TA')} 的更多作品`, more.byUploader, false))
+  if (more.hot.length) blocks.push(moreList('本周热门', more.hot, true))
+  return blocks.join('')
+}
+
+function moreList(label, songs, ranked) {
+  const rows = songs.map((s, i) => `<li><a class="row${ranked ? '' : ' row-plain'}" href="/song/${esc(s.display_id.toLowerCase())}">${
+    ranked ? `<div class="rank">${String(i + 1).padStart(2, '0')}</div>` : ''
+  }<img src="${esc(s.cover_url || DEFAULT_IMAGE)}" alt="" width="52" height="52" loading="lazy"><div class="row-main"><div class="row-title">${esc(s.title)}</div><div class="row-by">${esc(ranked ? s.uploader_name : (s.tags || []).map(t => t.name).join('、'))}</div></div><div class="row-plays"><i class="fas fa-headphones"></i> ${fmtCount(s.play_count ?? 0)}</div></a></li>`)
+  return `<div class="song-more-block"><h2 class="song-h">${label}</h2><ol class="list">${rows.join('')}</ol></div>`
 }
 
 const detail = (label, body) => `<div class="detail"><h2 class="song-h">${label}</h2><div class="detail-body">${body}</div></div>`
@@ -263,6 +302,7 @@ function jsonLd(song, canonical, description) {
 /* ---------- helpers ---------- */
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+const fmtCount = n => n >= 10000 ? (n / 10000).toFixed(n >= 100000 ? 0 : 1).replace(/\.0$/, '') + ' 万' : String(n)
 const fmtDuration = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`
 // Dates are shown in Beijing time (UTC+8), where most of the community is.
 const fmtDate = iso => {
