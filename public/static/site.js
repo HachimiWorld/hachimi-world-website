@@ -23,6 +23,12 @@
       openWeb: '打开网页版',
       webNote: '实验性 · 无需安装',
       harmonyNote: '开发中',
+      macTitle: '首次打开',
+      macText: '安装包未经 Apple 公证，首次打开时系统可能提示应用已损坏。将应用拖入“应用程序”文件夹后，在终端执行以下命令即可。',
+      iosTitle: '安装方式',
+      iosText: '安装包未经签名，需用自己的 Apple ID 签名后安装。免费账号签名的应用有效期为 7 天，到期后重新签名即可。',
+      iosGuide: 'iOS 安装教程',
+      iosGuideHref: '/ios/',
       notes: {
         windows: 'Windows 10 及以上 · MSI',
         macos: '仅 Apple Silicon（M 系列）',
@@ -50,6 +56,12 @@
       openWeb: 'Open the web app',
       webNote: 'Experimental · No installation',
       harmonyNote: 'In development',
+      macTitle: 'First launch',
+      macText: 'The app is not notarized by Apple, so macOS may report it as damaged on first launch. After moving it to Applications, run this command in Terminal.',
+      iosTitle: 'Installing',
+      iosText: 'The package is unsigned. Sign it with your own Apple ID to install it. Apps signed with a free Apple ID expire after 7 days; sign again to keep using it.',
+      iosGuide: 'iOS installation guide',
+      iosGuideHref: '/en/ios/',
       notes: {
         windows: 'Windows 10 or later · MSI',
         macos: 'Apple Silicon (M-series) only',
@@ -211,6 +223,17 @@
       <button type="button" data-copy="${esc(sha256)}">${T.copy}</button></div>`
   }
 
+  // The DMG is not notarized and the IPA is unsigned, so both need a step after downloading.
+  // The macOS bundle is named 基米天堂 in every language (desktopApp/build.gradle.kts).
+  const MAC_CMD = 'xattr -dr com.apple.quarantine "/Applications/基米天堂.app"'
+  function installNote(key) {
+    if (key === 'macos') return `<div class="install"><b>${T.macTitle}</b><p>${T.macText}</p>
+      <div class="cmd"><code>${esc(MAC_CMD)}</code><button type="button" data-copy="${esc(MAC_CMD)}">${T.copy}</button></div></div>`
+    if (key === 'ios') return `<div class="install"><b>${T.iosTitle}</b><p>${T.iosText}</p>
+      <a class="guide-link" href="${T.iosGuideHref}">${T.iosGuide} <i class="fas fa-arrow-right"></i></a></div>`
+    return ''
+  }
+
   document.addEventListener('click', async e => {
     const btn = e.target.closest('button[data-copy]')
     if (!btn) return
@@ -254,6 +277,7 @@
           <div class="os"><i class="fas fa-globe"></i><span>${detected === 'ios' ? T.iosHint : T.noInstall}</span></div>
           <h3>${T.web}</h3>
           <a class="btn btn-accent" href="${WEB_APP}"><i class="fas fa-arrow-up-right-from-square"></i> ${T.openWeb}</a>
+          ${detected === 'ios' ? `<a class="guide-link" href="${T.iosGuideHref}">${T.iosGuide} <i class="fas fa-arrow-right"></i></a>` : ''}
           ${changesHtml}`
         return
       }
@@ -266,6 +290,7 @@
         <a class="btn btn-accent" href="${esc(v.url)}"><i class="fas fa-download"></i> ${esc(T.downloadVer(shortVer(v.version_name)))}</a>
         <div class="ver" title="${esc(v.version_name)}">${esc(T.notes[p.key])} · ${esc(T.released(date))}</div>
         ${checksum(v.sha256)}
+        ${installNote(key)}
         ${changesHtml}`
     }
 
