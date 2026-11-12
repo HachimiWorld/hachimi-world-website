@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>在 iPhone 上安装 - 基米天堂</title>
+
+  <script>
+    (function () {
+      var t = null
+      try { t = localStorage.getItem('theme') } catch (e) {}
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      document.documentElement.setAttribute('data-theme', t)
+    })()
+  </script>
+
+  <meta name="description" content="基米天堂 iOS 安装包未经签名，需用自己的 Apple ID 签名后安装。本页说明使用 Sideloadly 安装的步骤、有效期与常见问题。">
+  <link rel="canonical" href="https://hachimi.world/ios/">
+  <link rel="alternate" href="https://hachimi.world/ios/" hreflang="zh-CN">
+  <link rel="alternate" href="https://hachimi.world/en/ios/" hreflang="en">
+  <meta property="og:site_name" content="基米天堂">
+  <meta property="og:title" content="在 iPhone 上安装 - 基米天堂">
+  <meta property="og:description" content="用自己的 Apple ID 签名并安装基米天堂 iOS 客户端。">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://hachimi.world/ios/">
+  <meta property="og:image" content="https://hachimi.world/static/og-image.jpg">
+  <meta property="og:locale" content="zh_CN">
+
+  <meta name="theme-color" id="theme-meta" content="#FBF8F3">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/site.css">
+  <link rel="stylesheet" href="/static/guide.css">
+  <script src="/static/base.js" defer></script>
+  <script src="/static/ios.js" defer></script>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/" aria-label="基米天堂">
+      <img class="only-light" src="/static/logo-light.svg" alt="基米天堂">
+      <img class="only-dark" src="/static/logo-dark.svg" alt="基米天堂">
+    </a>
+    <div class="nav-right">
+      <button class="icon-btn" id="theme-toggle" aria-label="切换亮色/暗色">
+        <i class="fas fa-moon only-light"></i><i class="fas fa-sun only-dark"></i>
+      </button>
+      <a class="icon-btn lang" href="/en/ios/" aria-label="English">EN</a>
+      <a class="icon-btn" href="https://github.com/HachimiWorld" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+      <a class="btn btn-ghost btn-sm btn-open-web" href="https://app.hachimi.world">网页版</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap guide">
+  <a class="back" href="/#download"><i class="fas fa-arrow-left"></i> 下载</a>
+  <h1>在 iPhone 上安装</h1>
+  <p class="lead">iOS 安装包（IPA）未经签名，需要用自己的 Apple ID 签名后才能安装。以下以 Sideloadly 为例，第一次安装约需十分钟。</p>
+  <div class="cta">
+    <a class="btn btn-accent" id="ipa-dl" href="/#download"><i class="fas fa-download"></i><span>下载 IPA</span></a>
+    <a class="btn btn-ghost" href="https://app.hachimi.world">打开网页版 <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <p class="cta-note">网页版无需安装，可在 iPhone 的 Safari 中直接使用。</p>
+
+  <section>
+    <span class="label">01</span>
+    <h2>准备</h2>
+    <ul class="plain">
+      <li>一台 Windows 或 Mac 电脑，以及连接 iPhone 的数据线。</li>
+      <li>一个 Apple ID，免费账号即可。如有顾虑，可使用单独注册的账号。</li>
+      <li>基米天堂 IPA 安装包，可从本页上方下载。</li>
+    </ul>
+  </section>
+
+  <section>
+    <span class="label">02</span>
+    <h2>使用 Sideloadly 安装</h2>
+    <ol class="steps">
+      <li>
+        <b>安装 Sideloadly</b>
+        <p>从 <a class="ext" href="https://sideloadly.io" target="_blank" rel="noopener">sideloadly.io</a> 下载并安装。Windows 还需要安装 Apple 官网提供的 iTunes 与 iCloud，Microsoft Store 中的版本不可用。</p>
+      </li>
+      <li>
+        <b>连接 iPhone</b>
+        <p>用数据线连接电脑并解锁 iPhone，在弹出的提示中选择“信任”。</p>
+      </li>
+      <li>
+        <b>签名并安装</b>
+        <p>将 IPA 拖入 Sideloadly 窗口，在 Apple ID 一栏填写账号，点击 <kbd>Start</kbd>，按提示输入密码与双重认证验证码。完成后，应用会出现在主屏幕上。</p>
+      </li>
+      <li>
+        <b>信任开发者</b>
+        <p>在 iPhone 上打开“设置 → 通用 → VPN 与设备管理”，选择自己的 Apple ID，点击“信任”。</p>
+      </li>
+      <li>
+        <b>开启开发者模式</b>
+        <p>iOS 16 及以上需要此步骤。打开“设置 → 隐私与安全性 → 开发者模式”，开启后按提示重启，重启后再确认一次。</p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <span class="label">03</span>
+    <h2>有效期与更新</h2>
+    <ul class="plain">
+      <li>免费 Apple ID 签名的应用有效期为 7 天，到期后无法打开。用同一 Apple ID 重新执行第 3 步即可。</li>
+      <li>免费 Apple ID 同一时间最多保留 3 个自签名应用。</li>
+      <li>付费开发者账号签名的应用有效期为 1 年。</li>
+      <li>新版本发布后，下载新的 IPA，同样按第 3 步安装。</li>
+    </ul>
+  </section>
+
+  <section>
+    <span class="label">04</span>
+    <h2>其他签名工具</h2>
+    <p><a class="ext" href="https://altstore.io" target="_blank" rel="noopener">AltStore</a> 与 <a class="ext" href="https://sidestore.io" target="_blank" rel="noopener">SideStore</a> 同样可以安装 IPA，并能在手机上续签，省去每次连接电脑。安装方式见各自官网，装好后导入基米天堂的 IPA 即可。</p>
+  </section>
+
+  <section>
+    <span class="label">05</span>
+    <h2>常见问题</h2>
+    <dl class="faq">
+      <dt>打开时提示“不受信任的开发者”</dt>
+      <dd>完成第 4 步。</dd>
+      <dt>设置中找不到“开发者模式”</dt>
+      <dd>该选项在安装第一个自签名应用后才会出现。先完成第 3 步，再回到设置中查找。</dd>
+      <dt>应用此前正常，现在无法打开</dt>
+      <dd>签名已过期。重新执行第 3 步即可。</dd>
+      <dt>其他问题</dt>
+      <dd>可以在 <a class="ext" href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener">Discord</a> 或 <a class="ext" href="https://github.com/HachimiWorld/hachimi-world-client/discussions" target="_blank" rel="noopener">GitHub 讨论区</a> 提出。</dd>
+    </dl>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <img class="only-light" src="/static/logo-light.svg" alt="基米天堂">
+    <img class="only-dark" src="/static/logo-dark.svg" alt="基米天堂">
+    <nav>
+      <a href="https://app.hachimi.world">网页版</a>
+      <a href="/#download">下载</a>
+      <a href="https://github.com/HachimiWorld" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener">Discord</a>
+      <a href="/en/ios/">English</a>
+    </nav>
+    <small>© 2026 基米天堂 · AGPLv3 · 为爱发电</small>
+  </div>
+</footer>
+
+</body>
+</html>
