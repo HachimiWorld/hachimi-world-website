@@ -224,8 +224,8 @@
   }
 
   // The DMG is not notarized and the IPA is unsigned, so both need a step after downloading.
-  // The macOS bundle is named 基米天堂 in every language (desktopApp/build.gradle.kts).
-  const MAC_CMD = 'xattr -dr com.apple.quarantine "/Applications/基米天堂.app"'
+  // The bundle is "Hachimi World.app": jpackage takes the top-level packageName; the macOS one only sets the DMG name.
+  const MAC_CMD = 'xattr -dr com.apple.quarantine "/Applications/Hachimi World.app"'
   function installNote(key) {
     if (key === 'macos') return `<div class="install"><b>${T.macTitle}</b><p>${T.macText}</p>
       <div class="cmd"><code>${esc(MAC_CMD)}</code><button type="button" data-copy="${esc(MAC_CMD)}">${T.copy}</button></div></div>`
