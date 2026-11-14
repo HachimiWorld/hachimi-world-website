@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Install on iPhone - Hachimi World</title>
+
+  <script>
+    (function () {
+      var t = null
+      try { t = localStorage.getItem('theme') } catch (e) {}
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      document.documentElement.setAttribute('data-theme', t)
+    })()
+  </script>
+
+  <meta name="description" content="The Hachimi World iOS package is unsigned and needs to be signed with your own Apple ID. This page covers installing it with Sideloadly, how long it lasts, and common problems.">
+  <link rel="canonical" href="https://hachimi.world/en/ios/">
+  <link rel="alternate" href="https://hachimi.world/ios/" hreflang="zh-CN">
+  <link rel="alternate" href="https://hachimi.world/en/ios/" hreflang="en">
+  <meta property="og:site_name" content="Hachimi World">
+  <meta property="og:title" content="Install on iPhone - Hachimi World">
+  <meta property="og:description" content="Sign and install the Hachimi World iOS app with your own Apple ID.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://hachimi.world/en/ios/">
+  <meta property="og:image" content="https://hachimi.world/static/og-image.jpg">
+  <meta property="og:locale" content="en_US">
+
+  <meta name="theme-color" id="theme-meta" content="#FBF8F3">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/site.css">
+  <link rel="stylesheet" href="/static/guide.css">
+  <script src="/static/base.js" defer></script>
+  <script src="/static/ios.js" defer></script>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/en/" aria-label="Hachimi World">
+      <img class="only-light" src="/static/logo-light.svg" alt="Hachimi World">
+      <img class="only-dark" src="/static/logo-dark.svg" alt="Hachimi World">
+    </a>
+    <div class="nav-right">
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle light/dark theme">
+        <i class="fas fa-moon only-light"></i><i class="fas fa-sun only-dark"></i>
+      </button>
+      <a class="icon-btn lang" href="/ios/" aria-label="中文">中</a>
+      <a class="icon-btn" href="https://github.com/HachimiWorld" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+      <a class="btn btn-ghost btn-sm btn-open-web" href="https://app.hachimi.world">Web</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap guide">
+  <a class="back" href="/en/#download"><i class="fas fa-arrow-left"></i> Download</a>
+  <h1>Install on iPhone</h1>
+  <p class="lead">The iOS package (IPA) is unsigned, so you need to sign it with your own Apple ID before it can be installed. The steps below use Sideloadly; the first install takes about ten minutes.</p>
+  <div class="cta">
+    <a class="btn btn-accent" id="ipa-dl" href="/en/#download"><i class="fas fa-download"></i><span>Download IPA</span></a>
+    <a class="btn btn-ghost" href="https://app.hachimi.world">Open the web app <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <p class="cta-note">The web app needs no installation and runs in Safari on iPhone.</p>
+
+  <section>
+    <span class="label">01</span>
+    <h2>What you need</h2>
+    <ul class="plain">
+      <li>A Windows PC or a Mac, and a cable to connect your iPhone.</li>
+      <li>An Apple ID. A free one works. If you have concerns, use a separate account.</li>
+      <li>The Hachimi World IPA, from the button above.</li>
+    </ul>
+  </section>
+
+  <section>
+    <span class="label">02</span>
+    <h2>Install with Sideloadly</h2>
+    <ol class="steps">
+      <li>
+        <b>Install Sideloadly</b>
+        <p>Download and install it from <a class="ext" href="https://sideloadly.io" target="_blank" rel="noopener">sideloadly.io</a>. On Windows, also install iTunes and iCloud from Apple's website; the Microsoft Store versions do not work.</p>
+      </li>
+      <li>
+        <b>Connect your iPhone</b>
+        <p>Connect it to the computer with the cable, unlock it, and tap “Trust” when asked.</p>
+      </li>
+      <li>
+        <b>Sign and install</b>
+        <p>Drag the IPA into the Sideloadly window, enter your Apple ID, click <kbd>Start</kbd>, then enter your password and two-factor code when prompted. When it finishes, the app appears on your Home Screen.</p>
+      </li>
+      <li>
+        <b>Trust the developer</b>
+        <p>On your iPhone, open Settings → General → VPN &amp; Device Management, select your Apple ID and tap “Trust”.</p>
+      </li>
+      <li>
+        <b>Turn on Developer Mode</b>
+        <p>Required on iOS 16 and later. Open Settings → Privacy &amp; Security → Developer Mode, turn it on, restart when prompted, then confirm once more.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <span class="label">03</span>
+    <h2>Expiry and updates</h2>
+    <ul class="plain">
+      <li>Apps signed with a free Apple ID expire after 7 days and then won't open. Repeat step 3 with the same Apple ID.</li>
+      <li>A free Apple ID can keep at most 3 self-signed apps at a time.</li>
+      <li>Apps signed with a paid developer account last 1 year.</li>
+      <li>When a new version is released, download the new IPA and install it the same way, from step 3.</li>
+    </ul>
+  </section>
+
+  <section>
+    <span class="label">04</span>
+    <h2>Other signing tools</h2>
+    <p><a class="ext" href="https://altstore.io" target="_blank" rel="noopener">AltStore</a> and <a class="ext" href="https://sidestore.io" target="_blank" rel="noopener">SideStore</a> can also install IPAs, and can re-sign apps on the phone so you don't need to connect to a computer each time. See their websites for setup, then import the Hachimi World IPA.</p>
+  </section>
+
+  <section>
+    <span class="label">05</span>
+    <h2>Common problems</h2>
+    <dl class="faq">
+      <dt>“Untrusted Developer” when opening the app</dt>
+      <dd>Complete step 4.</dd>
+      <dt>Developer Mode is missing from Settings</dt>
+      <dd>It only appears after the first self-signed app is installed. Complete step 3, then look again.</dd>
+      <dt>The app worked before but won't open now</dt>
+      <dd>The signature has expired. Repeat step 3.</dd>
+      <dt>Something else</dt>
+      <dd>Ask on <a class="ext" href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener">Discord</a> or in <a class="ext" href="https://github.com/HachimiWorld/hachimi-world-client/discussions" target="_blank" rel="noopener">GitHub Discussions</a>.</dd>
+    </dl>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <img class="only-light" src="/static/logo-light.svg" alt="Hachimi World">
+    <img class="only-dark" src="/static/logo-dark.svg" alt="Hachimi World">
+    <nav>
+      <a href="https://app.hachimi.world">Web app</a>
+      <a href="/en/#download">Download</a>
+      <a href="https://github.com/HachimiWorld" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://discord.gg/KGBaW8SwBF" target="_blank" rel="noopener">Discord</a>
+      <a href="/ios/">中文</a>
+    </nav>
+    <small>© 2026 Hachimi World · AGPLv3 · A labour of love</small>
+  </div>
+</footer>
+
+</body>
+</html>

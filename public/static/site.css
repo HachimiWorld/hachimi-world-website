@@ -349,6 +349,22 @@ section { padding: 120px 0 0; }
   border: 1px solid rgba(244, 239, 233, .24); border-radius: 999px; padding: 2px 10px;
 }
 .dl-main .sum button:hover { background: rgba(244, 239, 233, .08); }
+.dl-main .install { border-top: 1px solid rgba(244, 239, 233, .14); padding-top: 20px; display: grid; gap: 10px; }
+.dl-main .install b { font-size: 14px; opacity: .7; font-weight: 600; }
+.dl-main .install p { margin: 0; font-size: 14px; line-height: 1.7; opacity: .8; }
+.dl-main .cmd {
+  display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 14px; border-radius: var(--radius-sm);
+  background: rgba(244, 239, 233, .07); border: 1px solid rgba(244, 239, 233, .12);
+}
+.dl-main .cmd code { flex: 1; min-width: 0; font: 13px/1.5 var(--mono); overflow-wrap: anywhere; user-select: all; }
+.dl-main .cmd button {
+  flex: none; font-size: 13px; border: 1px solid rgba(244, 239, 233, .24); border-radius: 999px; padding: 4px 12px;
+}
+.dl-main .cmd button:hover { background: rgba(244, 239, 233, .08); }
+.dl-main .guide-link { align-self: flex-start; display: inline-flex; gap: 8px; align-items: center; font-size: 14px; font-weight: 600; color: #FF9557; }
+.dl-main .guide-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+/* The link sits right under the web-app button; pull it up like the checksum row. */
+.dl-main > .guide-link { margin-top: -8px; }
 .changes { border-top: 1px solid rgba(244, 239, 233, .14); padding-top: 20px; }
 .changes b { font-size: 14px; opacity: .7; font-weight: 600; }
 .changes ul { margin: 10px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 15px; }
