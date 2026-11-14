@@ -224,7 +224,7 @@
   }
 
   // The DMG is not notarized and the IPA is unsigned, so both need a step after downloading.
-  // The bundle is "Hachimi World.app": jpackage takes the top-level packageName; the macOS one only sets the DMG name.
+  // The installed bundle is "Hachimi World.app" (checked on a 1.7.0 release build), despite macOS packageName = "基米天堂".
   const MAC_CMD = 'xattr -dr com.apple.quarantine "/Applications/Hachimi World.app"'
   function installNote(key) {
     if (key === 'macos') return `<div class="install"><b>${T.macTitle}</b><p>${T.macText}</p>
